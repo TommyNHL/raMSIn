@@ -128,7 +128,7 @@ fnaDEFSDf[fnaDEFSDf.type .== 1, :]
 # ==================================================================================================
 ## define a function for Random Forest ##
 function optimRandomForestClass(inputDB, inputDB_ingested, inputDB_ext, inputDB_FNA)
-    leaf_r = vcat(collect(2, 4, 8, 12, 18))  # 5
+    leaf_r = vcat(2, 4, 8, 12, 18)  # 5
     depth_r = vcat(collect(2:1:10))  # 9
     split_r = vcat(collect(2:1:10))  # 9
     tree_r = vcat(collect(50:50:300))  # 6
