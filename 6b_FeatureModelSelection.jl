@@ -24,7 +24,7 @@ using ScikitLearn  #: @sk_import, fit!, predict
 @sk_import tree: DecisionTreeClassifier
 @sk_import metrics: recall_score
 @sk_import neural_network: MLPClassifier
-@sk_import svm: SVC
+@sk_import svm: LinearSVC
 @sk_import neighbors: KNeighborsClassifier
 @sk_import inspection: permutation_importance
 #using ScikitLearn.GridSearch: RandomizedSearchCV
@@ -607,9 +607,12 @@ CSV.write(savePath, optiSearch_df)
 ## define a function for Support Vector Machine ##
 function optimSVM(inputDB, inputDB_ingested, inputDB_ext, inputDB_FNA)
 
-    gamma_r = ["scale", "auto"] # 2
-    kernel_r = ["linear", "poly", "rbf", "sigmoid"]  # 4
-    c_values_r = vcat(1.0, 0.1, 0.01, 0.001, 0.0001, 0.00001)  # 6
+    penalty_r = ["l1", "l2"]  # 2
+    loss_r = ["hinge", "squared_hinge"]  # 2
+    #gamma_r = ["scale", "auto"] # 2
+    #kernel_r = ["linear", "poly", "rbf", "sigmoid"]  # 4
+    c_values_r = vcat(10, 5, 1.0, 0.5, 0.1, 0.05, 0.01, 0.005, 0.001, 0.0005, 0.0001, 0.00005, 0.00001, 0.000005, 0.000001)  # 15
+    c_values_r = vcat(0.00009, 0.00008, 0.00007, 0.00006, 0.00005, 0.00004, 0.00003, 0.00002, 0.00001, 0.000009, 0.000008, 0.000007, 0.000006, 0.000005, 0.000004, 0.000003, 0.000002, 0.000001, 0.0000009, 0.0000008, 0.0000007, 0.0000006, 0.0000005, 0.0000004, 0.0000003, 0.0000002, 0.0000001)  # 15
     
     rs = 42
     z = zeros(1,48)
@@ -620,267 +623,309 @@ function optimSVM(inputDB, inputDB_ingested, inputDB_ext, inputDB_FNA)
     M_ext = inputDB_ext
     M_FNA = inputDB_FNA
 
-    for g in 1:2
-        for k in 1:4
-            for c in c_values_r
-                println("itr=", itr, ", G=", g, ", K=", k, ", C=", c)
-                println("## loading in data ##")
-                Xx_train = deepcopy(M_train[:, 2:end-1])
-                nn_train = deepcopy(N_train[:, 2:end-1])
-                Xx_Ext = deepcopy(M_ext[:, 2:end-1])
-                Xx_FNA = deepcopy(M_FNA[:, 2:end-1])
-                #
-                Yy_train = deepcopy(M_train[:, end])
-                mm_train = deepcopy(N_train[:, end])
-                Yy_Ext = deepcopy(M_ext[:, end])
-                Yy_FNA = deepcopy(M_FNA[:, end])
-                println("## Classification ##")
-                reg = SVC(C=c, kernel=kernel_r[k], gamma=gamma_r[g], random_state=rs, class_weight=Dict(0=>0.9628, 1=>1.0402))
-                println("## fit ##")
-                fit!(reg, Matrix(Xx_train), Vector(Yy_train))
-                importances = permutation_importance(reg, Matrix(Xx_FNA), Vector(Yy_FNA), n_repeats=10, random_state=42)
-                print(importances["importances_mean"])
-                if itr == 1
-                    z[1,1] = g
-                    z[1,2] = k
-                    z[1,3] = c
-                    z[1,4] = f1_score(Vector(mm_train), predict(reg, Matrix(nn_train)), sample_weight=sampleW)
-                    z[1,5] = matthews_corrcoef(Vector(mm_train), predict(reg, Matrix(nn_train)), sample_weight=sampleW)
-                    z[1,6] = f1_score(Vector(Yy_Ext), predict(reg, Matrix(Xx_Ext)), sample_weight=sampleExtW)
-                    z[1,7] = matthews_corrcoef(Vector(Yy_Ext), predict(reg, Matrix(Xx_Ext)), sample_weight=sampleExtW)
-                    println("## CV ##")
-                    f1_10_train = cross_val_score(reg, Matrix(Xx_train), Vector(Yy_train); cv = 3, scoring=f1)
-                    z[1,8] = avgScore(f1_10_train, 3)
-                    z[1,9] = f1_score(Vector(Yy_FNA), predict(reg, Matrix(Xx_FNA)), sample_weight=sampleFNAW)
-                    z[1,10] = matthews_corrcoef(Vector(Yy_FNA), predict(reg, Matrix(Xx_FNA)), sample_weight=sampleFNAW)
-                    z[1,11] = recall_score(Vector(Yy_FNA), predict(reg, Matrix(Xx_FNA)))
-                    z[1,12] = rs
-                    z[1,13] = importances["importances_mean"][1]
-                    z[1,14] = importances["importances_mean"][2]
-                    z[1,15] = importances["importances_mean"][3]
-                    z[1,16] = importances["importances_mean"][4]
-                    z[1,17] = importances["importances_mean"][5]
-                    z[1,18] = importances["importances_mean"][6]
-                    z[1,19] = importances["importances_mean"][7]
-                    z[1,20] = importances["importances_mean"][8]
-                    z[1,21] = importances["importances_mean"][9]
-                    z[1,22] = importances["importances_mean"][10]
-                    z[1,23] = importances["importances_mean"][11]
-                    z[1,24] = importances["importances_mean"][12]
-                    z[1,25] = importances["importances_mean"][13]
-                    z[1,26] = importances["importances_mean"][14]
-                    z[1,27] = importances["importances_mean"][15]
-                    z[1,28] = importances["importances_mean"][16]
-                    z[1,29] = importances["importances_mean"][17]
-                    z[1,30] = importances["importances_mean"][18]
-                    z[1,31] = importances["importances_std"][1]
-                    z[1,32] = importances["importances_std"][2]
-                    z[1,33] = importances["importances_std"][3]
-                    z[1,34] = importances["importances_std"][4]
-                    z[1,35] = importances["importances_std"][5]
-                    z[1,36] = importances["importances_std"][6]
-                    z[1,37] = importances["importances_std"][7]
-                    z[1,38] = importances["importances_std"][8]
-                    z[1,39] = importances["importances_std"][9]
-                    z[1,40] = importances["importances_std"][10]
-                    z[1,41] = importances["importances_std"][11]
-                    z[1,42] = importances["importances_std"][12]
-                    z[1,43] = importances["importances_std"][13]
-                    z[1,44] = importances["importances_std"][14]
-                    z[1,45] = importances["importances_std"][15]
-                    z[1,46] = importances["importances_std"][16]
-                    z[1,47] = importances["importances_std"][17]
-                    z[1,48] = importances["importances_std"][18]
-                else
-                    itrain = f1_score(Vector(mm_train), predict(reg, Matrix(nn_train)), sample_weight=sampleW)
-                    jtrain = matthews_corrcoef(Vector(mm_train), predict(reg, Matrix(nn_train)), sample_weight=sampleW)
-                    ival = f1_score(Vector(Yy_Ext), predict(reg, Matrix(Xx_Ext)), sample_weight=sampleExtW)
-                    jval = matthews_corrcoef(Vector(Yy_Ext), predict(reg, Matrix(Xx_Ext)), sample_weight=sampleExtW)
-                    println("## CV ##")
-                    f1_10_train = cross_val_score(reg, Matrix(Xx_train), Vector(Yy_train); cv = 3, scoring=f1)
-                    traincvtrain = avgScore(f1_10_train, 3) 
-                    f1s = f1_score(Vector(Yy_FNA), predict(reg, Matrix(Xx_FNA)), sample_weight=sampleFNAW)
-                    mccs = matthews_corrcoef(Vector(Yy_FNA), predict(reg, Matrix(Xx_FNA)), sample_weight=sampleFNAW)
-                    rec = recall_score(Vector(Yy_FNA), predict(reg, Matrix(Xx_FNA)))
-                    im1 = importances["importances_mean"][1]
-                    im2 = importances["importances_mean"][2]
-                    im3 = importances["importances_mean"][3]
-                    im4 = importances["importances_mean"][4]
-                    im5 = importances["importances_mean"][5]
-                    im6 = importances["importances_mean"][6]
-                    im7 = importances["importances_mean"][7]
-                    im8 = importances["importances_mean"][8]
-                    im9 = importances["importances_mean"][9]
-                    im10 = importances["importances_mean"][10]
-                    im11 = importances["importances_mean"][11]
-                    im12 = importances["importances_mean"][12]
-                    im13 = importances["importances_mean"][13]
-                    im14 = importances["importances_mean"][14]
-                    im15 = importances["importances_mean"][15]
-                    im16 = importances["importances_mean"][16]
-                    im17 = importances["importances_mean"][17]
-                    im18 = importances["importances_mean"][18]
-                    sd1 = importances["importances_std"][1]
-                    sd2 = importances["importances_std"][2]
-                    sd3 = importances["importances_std"][3]
-                    sd4 = importances["importances_std"][4]
-                    sd5 = importances["importances_std"][5]
-                    sd6 = importances["importances_std"][6]
-                    sd7 = importances["importances_std"][7]
-                    sd8 = importances["importances_std"][8]
-                    sd9 = importances["importances_std"][9]
-                    sd10 = importances["importances_std"][10]
-                    sd11 = importances["importances_std"][11]
-                    sd12 = importances["importances_std"][12]
-                    sd13 = importances["importances_std"][13]
-                    sd14 = importances["importances_std"][14]
-                    sd15 = importances["importances_std"][15]
-                    sd16 = importances["importances_std"][16]
-                    sd17 = importances["importances_std"][17]
-                    sd18 = importances["importances_std"][18]
-                    z = vcat(z, [g k c itrain jtrain ival jval traincvtrain f1s mccs rec rs im1 im2 im3 im4 im5 im6 im7 im8 im9 im10 im11 im12 im13 im14 im15 im16 im17 im18 sd1 sd2 sd3 sd4 sd5 sd6 sd7 sd8 sd9 sd10 sd11 sd12 sd13 sd14 sd15 sd16 sd17 sd18])
-                    println(z[end, :])
+    for p in 1:2
+        if (p == 1)
+            continue
+        elseif (p == 2)
+            for l in 1:2
+                for c in c_values_r
+                    println("itr=", itr, ", P=", p, ", L=", l, ", C=", c)
+                    println("## loading in data ##")
+                    Xx_train = deepcopy(M_train[:, 2:end-1])
+                    nn_train = deepcopy(N_train[:, 2:end-1])
+                    Xx_Ext = deepcopy(M_ext[:, 2:end-1])
+                    Xx_FNA = deepcopy(M_FNA[:, 2:end-1])
+                    #
+                    Yy_train = deepcopy(M_train[:, end])
+                    mm_train = deepcopy(N_train[:, end])
+                    Yy_Ext = deepcopy(M_ext[:, end])
+                    Yy_FNA = deepcopy(M_FNA[:, end])
+                    println("## Classification ##")
+                    reg = LinearSVC(penalty=penalty_r[p], loss=loss_r[l], C=c, random_state=rs, class_weight=Dict(0=>0.9628, 1=>1.0402))
+                    println("## fit ##")
+                    fit!(reg, Matrix(Xx_train), Vector(Yy_train))
+                    importances = permutation_importance(reg, Matrix(Xx_FNA), Vector(Yy_FNA), n_repeats=10, random_state=42)
+                    print(importances["importances_mean"])
+                    if itr == 1
+                        z[1,1] = p
+                        z[1,2] = l
+                        z[1,3] = c
+                        z[1,4] = f1_score(Vector(mm_train), predict(reg, Matrix(nn_train)), sample_weight=sampleW)
+                        z[1,5] = matthews_corrcoef(Vector(mm_train), predict(reg, Matrix(nn_train)), sample_weight=sampleW)
+                        z[1,6] = f1_score(Vector(Yy_Ext), predict(reg, Matrix(Xx_Ext)), sample_weight=sampleExtW)
+                        z[1,7] = matthews_corrcoef(Vector(Yy_Ext), predict(reg, Matrix(Xx_Ext)), sample_weight=sampleExtW)
+                        println("## CV ##")
+                        f1_10_train = cross_val_score(reg, Matrix(Xx_train), Vector(Yy_train); cv = 3, scoring=f1)
+                        z[1,8] = avgScore(f1_10_train, 3)
+                        z[1,9] = f1_score(Vector(Yy_FNA), predict(reg, Matrix(Xx_FNA)), sample_weight=sampleFNAW)
+                        z[1,10] = matthews_corrcoef(Vector(Yy_FNA), predict(reg, Matrix(Xx_FNA)), sample_weight=sampleFNAW)
+                        z[1,11] = recall_score(Vector(Yy_FNA), predict(reg, Matrix(Xx_FNA)))
+                        z[1,12] = rs
+                        z[1,13] = importances["importances_mean"][1]
+                        z[1,14] = importances["importances_mean"][2]
+                        z[1,15] = importances["importances_mean"][3]
+                        z[1,16] = importances["importances_mean"][4]
+                        z[1,17] = importances["importances_mean"][5]
+                        z[1,18] = importances["importances_mean"][6]
+                        z[1,19] = importances["importances_mean"][7]
+                        z[1,20] = importances["importances_mean"][8]
+                        z[1,21] = importances["importances_mean"][9]
+                        z[1,22] = importances["importances_mean"][10]
+                        z[1,23] = importances["importances_mean"][11]
+                        z[1,24] = importances["importances_mean"][12]
+                        z[1,25] = importances["importances_mean"][13]
+                        z[1,26] = importances["importances_mean"][14]
+                        z[1,27] = importances["importances_mean"][15]
+                        z[1,28] = importances["importances_mean"][16]
+                        z[1,29] = importances["importances_mean"][17]
+                        z[1,30] = importances["importances_mean"][18]
+                        z[1,31] = importances["importances_std"][1]
+                        z[1,32] = importances["importances_std"][2]
+                        z[1,33] = importances["importances_std"][3]
+                        z[1,34] = importances["importances_std"][4]
+                        z[1,35] = importances["importances_std"][5]
+                        z[1,36] = importances["importances_std"][6]
+                        z[1,37] = importances["importances_std"][7]
+                        z[1,38] = importances["importances_std"][8]
+                        z[1,39] = importances["importances_std"][9]
+                        z[1,40] = importances["importances_std"][10]
+                        z[1,41] = importances["importances_std"][11]
+                        z[1,42] = importances["importances_std"][12]
+                        z[1,43] = importances["importances_std"][13]
+                        z[1,44] = importances["importances_std"][14]
+                        z[1,45] = importances["importances_std"][15]
+                        z[1,46] = importances["importances_std"][16]
+                        z[1,47] = importances["importances_std"][17]
+                        z[1,48] = importances["importances_std"][18]
+                    else
+                        itrain = f1_score(Vector(mm_train), predict(reg, Matrix(nn_train)), sample_weight=sampleW)
+                        jtrain = matthews_corrcoef(Vector(mm_train), predict(reg, Matrix(nn_train)), sample_weight=sampleW)
+                        ival = f1_score(Vector(Yy_Ext), predict(reg, Matrix(Xx_Ext)), sample_weight=sampleExtW)
+                        jval = matthews_corrcoef(Vector(Yy_Ext), predict(reg, Matrix(Xx_Ext)), sample_weight=sampleExtW)
+                        println("## CV ##")
+                        f1_10_train = cross_val_score(reg, Matrix(Xx_train), Vector(Yy_train); cv = 3, scoring=f1)
+                        traincvtrain = avgScore(f1_10_train, 3) 
+                        f1s = f1_score(Vector(Yy_FNA), predict(reg, Matrix(Xx_FNA)), sample_weight=sampleFNAW)
+                        mccs = matthews_corrcoef(Vector(Yy_FNA), predict(reg, Matrix(Xx_FNA)), sample_weight=sampleFNAW)
+                        rec = recall_score(Vector(Yy_FNA), predict(reg, Matrix(Xx_FNA)))
+                        im1 = importances["importances_mean"][1]
+                        im2 = importances["importances_mean"][2]
+                        im3 = importances["importances_mean"][3]
+                        im4 = importances["importances_mean"][4]
+                        im5 = importances["importances_mean"][5]
+                        im6 = importances["importances_mean"][6]
+                        im7 = importances["importances_mean"][7]
+                        im8 = importances["importances_mean"][8]
+                        im9 = importances["importances_mean"][9]
+                        im10 = importances["importances_mean"][10]
+                        im11 = importances["importances_mean"][11]
+                        im12 = importances["importances_mean"][12]
+                        im13 = importances["importances_mean"][13]
+                        im14 = importances["importances_mean"][14]
+                        im15 = importances["importances_mean"][15]
+                        im16 = importances["importances_mean"][16]
+                        im17 = importances["importances_mean"][17]
+                        im18 = importances["importances_mean"][18]
+                        sd1 = importances["importances_std"][1]
+                        sd2 = importances["importances_std"][2]
+                        sd3 = importances["importances_std"][3]
+                        sd4 = importances["importances_std"][4]
+                        sd5 = importances["importances_std"][5]
+                        sd6 = importances["importances_std"][6]
+                        sd7 = importances["importances_std"][7]
+                        sd8 = importances["importances_std"][8]
+                        sd9 = importances["importances_std"][9]
+                        sd10 = importances["importances_std"][10]
+                        sd11 = importances["importances_std"][11]
+                        sd12 = importances["importances_std"][12]
+                        sd13 = importances["importances_std"][13]
+                        sd14 = importances["importances_std"][14]
+                        sd15 = importances["importances_std"][15]
+                        sd16 = importances["importances_std"][16]
+                        sd17 = importances["importances_std"][17]
+                        sd18 = importances["importances_std"][18]
+                        z = vcat(z, [p l c itrain jtrain ival jval traincvtrain f1s mccs rec rs im1 im2 im3 im4 im5 im6 im7 im8 im9 im10 im11 im12 im13 im14 im15 im16 im17 im18 sd1 sd2 sd3 sd4 sd5 sd6 sd7 sd8 sd9 sd10 sd11 sd12 sd13 sd14 sd15 sd16 sd17 sd18])
+                        println(z[end, :])
+                    end
+                    println("End of ", itr, " iterations")
+                    itr += 1
                 end
-                println("End of ", itr, " iterations")
-                itr += 1
             end
         end
+        z_df = DataFrame(penalty = z[:,1], loss = z[:,2], C_value = z[:,3], f1_train = z[:,4], mcc_train = z[:,5], f1_ext = z[:,6], mcc_ext = z[:,7], f1_3Ftrain = z[:,8], f1_fna = z[:,9], mcc_fna = z[:,10], recall = z[:,11], state = z[:,12], im1 = z[:,13], im2 = z[:,14], im3 = z[:,15], im4 = z[:,16], im5 = z[:,17], im6 = z[:,18], im7 = z[:,19], im8 = z[:,20], im9 = z[:,21], im10 = z[:,22], im11 = z[:,23], im12 = z[:,24], im13 = z[:,25], im14 = z[:,26], im15 = z[:,27], im16 = z[:,28], im17 = z[:,29], im18 = z[:,30], sd1 = z[:,31], sd2 = z[:,32], sd3 = z[:,33], sd4 = z[:,34], sd5 = z[:,35], sd6 = z[:,36], sd7 = z[:,37], sd8 = z[:,38], sd9 = z[:,39], sd10 = z[:,40], sd11 = z[:,41], sd12 = z[:,42], sd13 = z[:,43], sd14 = z[:,44], sd15 = z[:,45], sd16 = z[:,46], sd17 = z[:,47], sd18 = z[:,48])
+        z_df_sorted = sort(z_df, [:recall, :f1_fna, :f1_3Ftrain], rev=true)
+        return z_df_sorted
     end
-    z_df = DataFrame(gamma = z[:,1], kernel = z[:,2], C_value = z[:,3], f1_train = z[:,4], mcc_train = z[:,5], f1_ext = z[:,6], mcc_ext = z[:,7], f1_3Ftrain = z[:,8], f1_fna = z[:,9], mcc_fna = z[:,10], recall = z[:,11], state = z[:,12], im1 = z[:,13], im2 = z[:,14], im3 = z[:,15], im4 = z[:,16], im5 = z[:,17], im6 = z[:,18], im7 = z[:,19], im8 = z[:,20], im9 = z[:,21], im10 = z[:,22], im11 = z[:,23], im12 = z[:,24], im13 = z[:,25], im14 = z[:,26], im15 = z[:,27], im16 = z[:,28], im17 = z[:,29], im18 = z[:,30], sd1 = z[:,31], sd2 = z[:,32], sd3 = z[:,33], sd4 = z[:,34], sd5 = z[:,35], sd6 = z[:,36], sd7 = z[:,37], sd8 = z[:,38], sd9 = z[:,39], sd10 = z[:,40], sd11 = z[:,41], sd12 = z[:,42], sd13 = z[:,43], sd14 = z[:,44], sd15 = z[:,45], sd16 = z[:,46], sd17 = z[:,47], sd18 = z[:,48])
-    z_df_sorted = sort(z_df, [:recall, :f1_fna, :f1_3Ftrain], rev=true)
-    return z_df_sorted
 end
 
 ## call Support Vector Machine ##
 optiSearch_df = optimSVM(trainDEFSDf, ingestedDEFSDf, extDEFSDf, fnaDEFSDf)
 
 ## save ##
-savePath = "G:\\raMSIn\\XGB_Importance2\\hyperparameterTuning_modelSelection_SVM1.csv"
+savePath = "G:\\raMSIn\\XGB_Importance2\\hyperparameterTuning_modelSelection_SVM2.csv"
 CSV.write(savePath, optiSearch_df)
 
 
 # ==================================================================================================
 ## define a function for Gradient Boost ##
-function optimGradientBoostClass(inputDB, inputDB_test, inputDB_pest, inputDB_pest2)
-    lr_r = vcat(1, 0.1, 0.01, 0.001)  # 4
-    leaf_r = vcat(1,2)
-    tree_r = vcat(collect(50:100:350))  # 4
-    depth_r = vcat(collect(2:1:6))  # 5
-    split_r = vcat(2)
+function optimGradientBoostClass(inputDB, inputDB_ingested, inputDB_ext, inputDB_FNA)
+    lr_r = vcat(0.3, 0.1)  # 2
+    leaf_r = vcat(8, 12, 18)  # 3
+    depth_r = vcat(collect(6:2:10))  # 3
+    split_r = vcat(collect(10:10:20))  # 2
+    tree_r = vcat(collect(50:100:250))  # 3
+    
     rs = 42
-    z = zeros(1,31)
-    l = 2
-    r = 2
-    mod = 0
-    rank = vcat(5,6,7,9,10,13,14, 17)
-    N_train = inputDB
-    M_train = vcat(inputDB, inputDB[inputDB.LABEL .== 1, :], inputDB[inputDB.LABEL .== 1, :], inputDB[inputDB.LABEL .== 1, :], inputDB[inputDB.LABEL .== 1, :], inputDB[inputDB.LABEL .== 1, :], inputDB[inputDB.LABEL .== 1, :], inputDB[inputDB.LABEL .== 1, :], inputDB[inputDB.LABEL .== 1, :], inputDB[inputDB.LABEL .== 1, :])
-    M_val = inputDB_test
-    M_pest = inputDB_pest
-    M_pest2 = inputDB_pest2
+    z = zeros(1,50)
     itr = 1
+
+    N_train = inputDB
+    M_train = inputDB_ingested
+    M_ext = inputDB_ext
+    M_FNA = inputDB_FNA
+
     for lr in lr_r
-        for t in tree_r
+        for l in leaf_r
             for d in depth_r
-                println("itr=", itr, ", lr=", lr, ", leaf=", l, ", tree=", t, ", depth=", d, ", minSsplit=", r)
-                println("## loading in data ##")
-                Xx_train = deepcopy(M_train[:, rank])
-                nn_train = deepcopy(N_train[:, rank])
-                Xx_val = deepcopy(M_val[:, rank])
-                Xx_test = deepcopy(M_pest[:, rank])
-                Xx_test2 = deepcopy(M_pest2[:, rank])
-                #
-                Yy_train = deepcopy(M_train[:, end-4])
-                mm_train = deepcopy(N_train[:, end-4])
-                Yy_val = deepcopy(M_val[:, end-4])
-                Yy_test = deepcopy(M_pest[:, end-1])
-                Yy_test2 = deepcopy(M_pest2[:, end-1])
-                println("## Classification ##")
-                reg = GradientBoostingClassifier(learning_rate=lr, n_estimators=t, max_depth=d, min_samples_leaf=l, min_samples_split=r, random_state=rs)
-                println("## fit ##")
-                fit!(reg, Matrix(Xx_train), Vector(Yy_train))
-                importances = permutation_importance(reg, Matrix(Xx_test), Vector(Yy_test), n_repeats=10, random_state=42)
-                print(importances["importances_mean"])
-                if itr == 1
-                    z[1,1] = lr
-                    z[1,2] = l
-                    z[1,3] = t
-                    z[1,4] = d
-                    z[1,5] = r
-                    z[1,6] = f1_score(Vector(mm_train), predict(reg, Matrix(nn_train)), sample_weight=sampleW)
-                    z[1,7] = matthews_corrcoef(Vector(mm_train), predict(reg, Matrix(nn_train)), sample_weight=sampleW)
-                    z[1,8] = f1_score(Vector(Yy_val), predict(reg, Matrix(Xx_val)), sample_weight=sampletestW)
-                    z[1,9] = matthews_corrcoef(Vector(Yy_val), predict(reg, Matrix(Xx_val)), sample_weight=sampletestW)
-                    println("## CV ##")
-                    f1_10_train = cross_val_score(reg, Matrix(Xx_train), Vector(Yy_train); cv = 3, scoring=f1)
-                    z[1,10] = avgScore(f1_10_train, 3)
-                    z[1,11] = f1_score(Vector(Yy_test), predict(reg, Matrix(Xx_test)), sample_weight=samplepestW)
-                    z[1,12] = matthews_corrcoef(Vector(Yy_test), predict(reg, Matrix(Xx_test)), sample_weight=samplepestW)
-                    z[1,13] = recall_score(Vector(Yy_test2), predict(reg, Matrix(Xx_test2)))
-                    z[1,14] = rs
-                    z[1,15] = mod
-                    z[1,16] = importances["importances_mean"][1]
-                    z[1,17] = importances["importances_mean"][2]
-                    z[1,18] = importances["importances_mean"][3]
-                    z[1,19] = importances["importances_mean"][4]
-                    z[1,20] = importances["importances_mean"][5]
-                    z[1,21] = importances["importances_mean"][6]
-                    z[1,22] = importances["importances_mean"][7]
-                    z[1,23] = importances["importances_mean"][8]
-                    z[1,24] = importances["importances_std"][1]
-                    z[1,25] = importances["importances_std"][2]
-                    z[1,26] = importances["importances_std"][3]
-                    z[1,27] = importances["importances_std"][4]
-                    z[1,28] = importances["importances_std"][5]
-                    z[1,29] = importances["importances_std"][6]
-                    z[1,30] = importances["importances_std"][7]
-                    z[1,31] = importances["importances_std"][8]
-                    println(z[end, :])
-                else
-                    itrain = f1_score(Vector(mm_train), predict(reg, Matrix(nn_train)), sample_weight=sampleW)
-                    jtrain = matthews_corrcoef(Vector(mm_train), predict(reg, Matrix(nn_train)), sample_weight=sampleW)
-                    ival = f1_score(Vector(Yy_val), predict(reg, Matrix(Xx_val)), sample_weight=sampletestW)
-                    jval = matthews_corrcoef(Vector(Yy_val), predict(reg, Matrix(Xx_val)), sample_weight=sampletestW)
-                    println("## CV ##")
-                    f1_10_train = cross_val_score(reg, Matrix(Xx_train), Vector(Yy_train); cv = 3, scoring=f1)
-                    traincvtrain = avgScore(f1_10_train, 3) 
-                    f1s = f1_score(Vector(Yy_test), predict(reg, Matrix(Xx_test)), sample_weight=samplepestW)
-                    mccs = matthews_corrcoef(Vector(Yy_test), predict(reg, Matrix(Xx_test)), sample_weight=samplepestW)
-                    rec = recall_score(Vector(Yy_test2), predict(reg, Matrix(Xx_test2)))
-                    im1 = importances["importances_mean"][1]
-                    im2 = importances["importances_mean"][2]
-                    im3 = importances["importances_mean"][3]
-                    im4 = importances["importances_mean"][4]
-                    im5 = importances["importances_mean"][5]
-                    im6 = importances["importances_mean"][6]
-                    im7 = importances["importances_mean"][7]
-                    im8 = importances["importances_mean"][8]
-                    sd1 = importances["importances_std"][1]
-                    sd2 = importances["importances_std"][2]
-                    sd3 = importances["importances_std"][3]
-                    sd4 = importances["importances_std"][4]
-                    sd5 = importances["importances_std"][5]
-                    sd6 = importances["importances_std"][6]
-                    sd7 = importances["importances_std"][7]
-                    sd8 = importances["importances_std"][8]
-                    z = vcat(z, [lr l t d r itrain jtrain ival jval traincvtrain f1s mccs rec rs mod im1 im2 im3 im4 im5 im6 im7 im8 sd1 sd2 sd3 sd4 sd5 sd6 sd7 sd8])
-                    println(z[end, :])
+                for s in split_r
+                    for t in tree_r
+                        println("itr=", itr, ", lr=", lr, ", leaf=", l, ", depth=", d, ", minSsplit=", s, ", tree=", t)
+                        println("## loading in data ##")
+                        Xx_train = deepcopy(M_train[:, 2:end-1])
+                        nn_train = deepcopy(N_train[:, 2:end-1])
+                        Xx_Ext = deepcopy(M_ext[:, 2:end-1])
+                        Xx_FNA = deepcopy(M_FNA[:, 2:end-1])
+                        #
+                        Yy_train = deepcopy(M_train[:, end])
+                        mm_train = deepcopy(N_train[:, end])
+                        Yy_Ext = deepcopy(M_ext[:, end])
+                        Yy_FNA = deepcopy(M_FNA[:, end])
+                        println("## Classification ##")
+                        reg = GradientBoostingClassifier(learning_rate=lr, n_estimators=t, max_depth=d, min_samples_leaf=l, min_samples_split=s, random_state=rs, n_iter_no_change=5)
+                        println("## fit ##")
+                        fit!(reg, Matrix(Xx_train), Vector(Yy_train))
+                        importances = permutation_importance(reg, Matrix(Xx_FNA), Vector(Yy_FNA), n_repeats=10, random_state=42, n_jobs=-1)
+                        print(importances["importances_mean"])
+                        if itr == 1
+                            z[1,1] = lr
+                            z[1,2] = l
+                            z[1,3] = t
+                            z[1,4] = d
+                            z[1,5] = s
+                            z[1,6] = f1_score(Vector(mm_train), predict(reg, Matrix(nn_train)), sample_weight=sampleW)
+                            z[1,7] = matthews_corrcoef(Vector(mm_train), predict(reg, Matrix(nn_train)), sample_weight=sampleW)
+                            z[1,8] = f1_score(Vector(Yy_Ext), predict(reg, Matrix(Xx_Ext)), sample_weight=sampleExtW)
+                            z[1,9] = matthews_corrcoef(Vector(Yy_Ext), predict(reg, Matrix(Xx_Ext)), sample_weight=sampleExtW)
+                            println("## CV ##")
+                            f1_10_train = cross_val_score(reg, Matrix(Xx_train), Vector(Yy_train); cv = 3, scoring=f1)
+                            z[1,10] = avgScore(f1_10_train, 3)
+                            z[1,11] = f1_score(Vector(Yy_FNA), predict(reg, Matrix(Xx_FNA)), sample_weight=sampleFNAW)
+                            z[1,12] = matthews_corrcoef(Vector(Yy_FNA), predict(reg, Matrix(Xx_FNA)), sample_weight=sampleFNAW)
+                            z[1,13] = recall_score(Vector(Yy_FNA), predict(reg, Matrix(Xx_FNA)))
+                            z[1,14] = rs
+                            z[1,15] = importances["importances_mean"][1]
+                            z[1,16] = importances["importances_mean"][2]
+                            z[1,17] = importances["importances_mean"][3]
+                            z[1,18] = importances["importances_mean"][4]
+                            z[1,19] = importances["importances_mean"][5]
+                            z[1,20] = importances["importances_mean"][6]
+                            z[1,21] = importances["importances_mean"][7]
+                            z[1,22] = importances["importances_mean"][8]
+                            z[1,23] = importances["importances_mean"][9]
+                            z[1,24] = importances["importances_mean"][10]
+                            z[1,25] = importances["importances_mean"][11]
+                            z[1,26] = importances["importances_mean"][12]
+                            z[1,27] = importances["importances_mean"][13]
+                            z[1,28] = importances["importances_mean"][14]
+                            z[1,29] = importances["importances_mean"][15]
+                            z[1,30] = importances["importances_mean"][16]
+                            z[1,31] = importances["importances_mean"][17]
+                            z[1,32] = importances["importances_mean"][18]
+                            z[1,33] = importances["importances_std"][1]
+                            z[1,34] = importances["importances_std"][2]
+                            z[1,35] = importances["importances_std"][3]
+                            z[1,36] = importances["importances_std"][4]
+                            z[1,37] = importances["importances_std"][5]
+                            z[1,38] = importances["importances_std"][6]
+                            z[1,39] = importances["importances_std"][7]
+                            z[1,40] = importances["importances_std"][8]
+                            z[1,41] = importances["importances_std"][9]
+                            z[1,42] = importances["importances_std"][10]
+                            z[1,43] = importances["importances_std"][11]
+                            z[1,44] = importances["importances_std"][12]
+                            z[1,45] = importances["importances_std"][13]
+                            z[1,46] = importances["importances_std"][14]
+                            z[1,47] = importances["importances_std"][15]
+                            z[1,48] = importances["importances_std"][16]
+                            z[1,49] = importances["importances_std"][17]
+                            z[1,50] = importances["importances_std"][18]
+                        else
+                            itrain = f1_score(Vector(mm_train), predict(reg, Matrix(nn_train)), sample_weight=sampleW)
+                            jtrain = matthews_corrcoef(Vector(mm_train), predict(reg, Matrix(nn_train)), sample_weight=sampleW)
+                            ival = f1_score(Vector(Yy_Ext), predict(reg, Matrix(Xx_Ext)), sample_weight=sampleExtW)
+                            jval = matthews_corrcoef(Vector(Yy_Ext), predict(reg, Matrix(Xx_Ext)), sample_weight=sampleExtW)
+                            println("## CV ##")
+                            f1_10_train = cross_val_score(reg, Matrix(Xx_train), Vector(Yy_train); cv = 3, scoring=f1)
+                            traincvtrain = avgScore(f1_10_train, 3) 
+                            f1s = f1_score(Vector(Yy_FNA), predict(reg, Matrix(Xx_FNA)), sample_weight=sampleFNAW)
+                            mccs = matthews_corrcoef(Vector(Yy_FNA), predict(reg, Matrix(Xx_FNA)), sample_weight=sampleFNAW)
+                            rec = recall_score(Vector(Yy_FNA), predict(reg, Matrix(Xx_FNA)))
+                            im1 = importances["importances_mean"][1]
+                            im2 = importances["importances_mean"][2]
+                            im3 = importances["importances_mean"][3]
+                            im4 = importances["importances_mean"][4]
+                            im5 = importances["importances_mean"][5]
+                            im6 = importances["importances_mean"][6]
+                            im7 = importances["importances_mean"][7]
+                            im8 = importances["importances_mean"][8]
+                            im9 = importances["importances_mean"][9]
+                            im10 = importances["importances_mean"][10]
+                            im11 = importances["importances_mean"][11]
+                            im12 = importances["importances_mean"][12]
+                            im13 = importances["importances_mean"][13]
+                            im14 = importances["importances_mean"][14]
+                            im15 = importances["importances_mean"][15]
+                            im16 = importances["importances_mean"][16]
+                            im17 = importances["importances_mean"][17]
+                            im18 = importances["importances_mean"][18]
+                            sd1 = importances["importances_std"][1]
+                            sd2 = importances["importances_std"][2]
+                            sd3 = importances["importances_std"][3]
+                            sd4 = importances["importances_std"][4]
+                            sd5 = importances["importances_std"][5]
+                            sd6 = importances["importances_std"][6]
+                            sd7 = importances["importances_std"][7]
+                            sd8 = importances["importances_std"][8]
+                            sd9 = importances["importances_std"][9]
+                            sd10 = importances["importances_std"][10]
+                            sd11 = importances["importances_std"][11]
+                            sd12 = importances["importances_std"][12]
+                            sd13 = importances["importances_std"][13]
+                            sd14 = importances["importances_std"][14]
+                            sd15 = importances["importances_std"][15]
+                            sd16 = importances["importances_std"][16]
+                            sd17 = importances["importances_std"][17]
+                            sd18 = importances["importances_std"][18]
+                            z = vcat(z, [lr l t d s itrain jtrain ival jval traincvtrain f1s mccs rec rs im1 im2 im3 im4 im5 im6 im7 im8 im9 im10 im11 im12 im13 im14 im15 im16 im17 im18 sd1 sd2 sd3 sd4 sd5 sd6 sd7 sd8 sd9 sd10 sd11 sd12 sd13 sd14 sd15 sd16 sd17 sd18])
+                            println(z[end, :])
+                        end
+                        println("End of ", itr, " iterations")
+                        itr += 1
+                    end
                 end
-                println("End of ", itr, " iterations")
-                itr += 1
             end
         end
     end
-    z_df = DataFrame(learnRate = z[:,1], leaves = z[:,2], trees = z[:,3], depth = z[:,4], minSplit = z[:,5], f1_train = z[:,6], mcc_train = z[:,7], f1_val = z[:,8], mcc_val = z[:,9], f1_3Ftrain = z[:,10], f1_pest = z[:,11], mcc_pest = z[:,12], recall = z[:,13], state = z[:,14], model = z[:,15], im1 = z[:,16], im2 = z[:,17], im3 = z[:,18], im4 = z[:,19], im5 = z[:,20], im6 = z[:,21], im7 = z[:,22], im8 = z[:,23], sd1 = z[:,24], sd2 = z[:,25], sd3 = z[:,26], sd4 = z[:,27], sd5 = z[:,28], sd6 = z[:,29], sd7 = z[:,30], sd8 = z[:,31])
-    z_df_sorted = sort(z_df, [:recall, :f1_pest, :f1_3Ftrain], rev=true)
+    z_df = DataFrame(lr = z[:,1], leaves = z[:,2], trees = z[:,3], depth = z[:,4], minSplit = z[:,5], f1_train = z[:,6], mcc_train = z[:,7], f1_ext = z[:,8], mcc_ext = z[:,9], f1_3Ftrain = z[:,10], f1_fna = z[:,11], mcc_fna = z[:,12], recall = z[:,13], state = z[:,14], im1 = z[:,15], im2 = z[:,16], im3 = z[:,17], im4 = z[:,18], im5 = z[:,19], im6 = z[:,20], im7 = z[:,21], im8 = z[:,22], im9 = z[:,23], im10 = z[:,24], im11 = z[:,25], im12 = z[:,26], im13 = z[:,27], im14 = z[:,28], im15 = z[:,29], im16 = z[:,30], im17 = z[:,31], im18 = z[:,32], sd1 = z[:,33], sd2 = z[:,34], sd3 = z[:,35], sd4 = z[:,36], sd5 = z[:,37], sd6 = z[:,38], sd7 = z[:,39], sd8 = z[:,40], sd9 = z[:,41], sd10 = z[:,42], sd11 = z[:,43], sd12 = z[:,44], sd13 = z[:,45], sd14 = z[:,46], sd15 = z[:,47], sd16 = z[:,48], sd17 = z[:,49], sd18 = z[:,50])
+    z_df_sorted = sort(z_df, [:recall, :f1_fna, :f1_3Ftrain], rev=true)
     return z_df_sorted
 end
 
 ## call Gradient Boost ##
-optiSearch_df = optimGradientBoostClass(trainDEFSDf, testDEFSDf, noTeaDEFSDf, TeaDEFSDf)
+optiSearch_df = optimGradientBoostClass(trainDEFSDf, ingestedDEFSDf, extDEFSDf, fnaDEFSDf)
 
 ## save ##
-savePath = "F:\\UvA\\app\\hyperparameterTuning_modelSelection_GBM(0)_noFilter.csv"
+savePath = "G:\\raMSIn\\XGB_Importance2\\hyperparameterTuning_modelSelection_GBM1.csv"
 CSV.write(savePath, optiSearch_df)
 
 
