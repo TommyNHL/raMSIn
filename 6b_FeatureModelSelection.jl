@@ -128,9 +128,12 @@ fnaDEFSDf[fnaDEFSDf.type .== 1, :]
 # ==================================================================================================
 ## define a function for Random Forest ##
 function optimRandomForestClass(inputDB, inputDB_ingested, inputDB_ext, inputDB_FNA)
-    leaf_r = vcat(2, 4, 8, 12, 18)  # 5
-    depth_r = vcat(collect(2:1:10))  # 9
-    split_r = vcat(collect(2:1:10))  # 9
+    #leaf_r = vcat(2, 4, 8, 12, 18)  # 5
+    leaf_r = vcat(collect(20:2:30))  # 6
+    #depth_r = vcat(collect(2:1:10))  # 9
+    depth_r = vcat(2, 4, 8, collect(12:1:14))  # 6
+    #split_r = vcat(collect(2:1:10))  # 9
+    split_r = vcat(collect(10:10:20))  # 2
     tree_r = vcat(collect(50:50:300))  # 6
 
     rs = 42
@@ -280,7 +283,7 @@ end
 optiSearch_df = optimRandomForestClass(trainDEFSDf, ingestedDEFSDf, extDEFSDf, fnaDEFSDf)
 
 ## save ##
-savePath = "H:\\3_output_raMSIn\\hyperparameterTuning_modelSelection_RF1.csv"
+savePath = "H:\\3_output_raMSIn\\hyperparameterTuning_modelSelection_RF2.csv"
 CSV.write(savePath, optiSearch_df)
 
 
