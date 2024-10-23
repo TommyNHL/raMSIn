@@ -1066,47 +1066,45 @@ CSV.write(savePath, optiSearch_df)
 
 # ==================================================================================================
 ## define a function for Multi-Layer Perceptrons ##
-function optimMLP(inputDB, inputDB_test, inputDB_pest, inputDB_pest2)
+function optimMLP(inputDB, inputDB_ingested, inputDB_ext, inputDB_FNA)
     hls_r = [(8,8,8), (8,16,8), (8,16,16), (16,16,16), (16,16,8), (16,8,8), (16,8,16), (8,16,16)]  # 8
-    maxIter_r = vcat(100, 200)  # 2
+    maxIter_r = vcat(125, 150, 200, 250, 300, 400, 500)  # 7
     alpha_r = [0.0001, 0.05]  # 2
     act_r = ["tanh", "relu"]  # 2
     solver_r = ["sgd", "adam"]  # 2
     lr_r = ["constant", "adaptive"]  # 2
+
     rs = 42
-    z = zeros(1,32)
-    mod = 0
-    rank = vcat(5,6,7,9,10,13,14, 17)
-    N_train = inputDB
-    M_train = vcat(inputDB, inputDB[inputDB.LABEL .== 1, :], inputDB[inputDB.LABEL .== 1, :], inputDB[inputDB.LABEL .== 1, :], inputDB[inputDB.LABEL .== 1, :], inputDB[inputDB.LABEL .== 1, :], inputDB[inputDB.LABEL .== 1, :], inputDB[inputDB.LABEL .== 1, :], inputDB[inputDB.LABEL .== 1, :], inputDB[inputDB.LABEL .== 1, :])
-    M_val = inputDB_test
-    M_pest = inputDB_pest
-    M_pest2 = inputDB_pest2
+    z = zeros(1,51)
     itr = 1
+
+    N_train = inputDB
+    M_train = inputDB_ingested
+    M_ext = inputDB_ext
+    M_FNA = inputDB_FNA
+
     for hls in 1:8
         for it in maxIter_r
             for alph in alpha_r
                 for act in vcat(1,2)
                     for sol in vcat(1,2)
                         for lr in vcat(1,2)
-                            println("itr=", itr, ", hls=", hls, ", maxit=", it, ", act=", act, ", solver=", sol, ", alph=", alph, ", lr=", lr, ", model=", mod)
+                            println("itr=", itr, ", hls=", hls, ", maxit=", it, ", act=", act, ", solver=", sol, ", alph=", alph, ", lr=", lr)
                             println("## loading in data ##")
-                            Xx_train = deepcopy(M_train[:, rank])
-                            nn_train = deepcopy(N_train[:, rank])
-                            Xx_val = deepcopy(M_val[:, rank])
-                            Xx_test = deepcopy(M_pest[:, rank])
-                            Xx_test2 = deepcopy(M_pest2[:, rank])
+                            Xx_train = deepcopy(M_train[:, 2:end-1])
+                            nn_train = deepcopy(N_train[:, 2:end-1])
+                            Xx_Ext = deepcopy(M_ext[:, 2:end-1])
+                            Xx_FNA = deepcopy(M_FNA[:, 2:end-1])
                             #
-                            Yy_train = deepcopy(M_train[:, end-4])
-                            mm_train = deepcopy(N_train[:, end-4])
-                            Yy_val = deepcopy(M_val[:, end-4])
-                            Yy_test = deepcopy(M_pest[:, end-1])
-                            Yy_test2 = deepcopy(M_pest2[:, end-1])
+                            Yy_train = deepcopy(M_train[:, end])
+                            mm_train = deepcopy(N_train[:, end])
+                            Yy_Ext = deepcopy(M_ext[:, end])
+                            Yy_FNA = deepcopy(M_FNA[:, end])
                             println("## Classification ##")
-                            reg = MLPClassifier(hidden_layer_sizes=hls_r[hls], max_iter=it, activation=act_r[act], solver=solver_r[sol], alpha=alph, learning_rate=lr_r[lr], random_state=rs)  # 0.7263; 1.6048
+                            reg = MLPClassifier(hidden_layer_sizes=hls_r[hls], max_iter=it, activation=act_r[act], solver=solver_r[sol], alpha=alph, learning_rate=lr_r[lr], random_state=rs)
                             println("## fit ##")
                             fit!(reg, Matrix(Xx_train), Vector(Yy_train))
-                            importances = permutation_importance(reg, Matrix(Xx_test), Vector(Yy_test), n_repeats=10, random_state=42)
+                            importances = permutation_importance(reg, Matrix(Xx_FNA), Vector(Yy_FNA), n_repeats=10, random_state=42)
                             print(importances["importances_mean"])
                             if itr == 1
                                 z[1,1] = hls
@@ -1117,44 +1115,62 @@ function optimMLP(inputDB, inputDB_test, inputDB_pest, inputDB_pest2)
                                 z[1,6] = lr
                                 z[1,7] = f1_score(Vector(mm_train), predict(reg, Matrix(nn_train)), sample_weight=sampleW)
                                 z[1,8] = matthews_corrcoef(Vector(mm_train), predict(reg, Matrix(nn_train)), sample_weight=sampleW)
-                                z[1,9] = f1_score(Vector(Yy_val), predict(reg, Matrix(Xx_val)), sample_weight=sampletestW)
-                                z[1,10] = matthews_corrcoef(Vector(Yy_val), predict(reg, Matrix(Xx_val)), sample_weight=sampletestW)
+                                z[1,9] = f1_score(Vector(Yy_Ext), predict(reg, Matrix(Xx_Ext)), sample_weight=sampleExtW)
+                                z[1,10] = matthews_corrcoef(Vector(Yy_Ext), predict(reg, Matrix(Xx_Ext)), sample_weight=sampleExtW)
                                 println("## CV ##")
                                 f1_10_train = cross_val_score(reg, Matrix(Xx_train), Vector(Yy_train); cv = 3, scoring=f1)
                                 z[1,11] = avgScore(f1_10_train, 3)
-                                z[1,12] = f1_score(Vector(Yy_test), predict(reg, Matrix(Xx_test)), sample_weight=samplepestW)
-                                z[1,13] = matthews_corrcoef(Vector(Yy_test), predict(reg, Matrix(Xx_test)), sample_weight=samplepestW)
-                                z[1,14] = recall_score(Vector(Yy_test2), predict(reg, Matrix(Xx_test2)))
+                                z[1,12] = f1_score(Vector(Yy_FNA), predict(reg, Matrix(Xx_FNA)), sample_weight=sampleFNAW)
+                                z[1,13] = matthews_corrcoef(Vector(Yy_FNA), predict(reg, Matrix(Xx_FNA)), sample_weight=sampleFNAW)
+                                z[1,14] = recall_score(Vector(Yy_FNA), predict(reg, Matrix(Xx_FNA)))
                                 z[1,15] = rs
-                                z[1,16] = mod
-                                z[1,17] = importances["importances_mean"][1]
-                                z[1,18] = importances["importances_mean"][2]
-                                z[1,19] = importances["importances_mean"][3]
-                                z[1,20] = importances["importances_mean"][4]
-                                z[1,21] = importances["importances_mean"][5]
-                                z[1,22] = importances["importances_mean"][6]
-                                z[1,23] = importances["importances_mean"][7]
-                                z[1,24] = importances["importances_mean"][8]
-                                z[1,25] = importances["importances_std"][1]
-                                z[1,26] = importances["importances_std"][2]
-                                z[1,27] = importances["importances_std"][3]
-                                z[1,28] = importances["importances_std"][4]
-                                z[1,29] = importances["importances_std"][5]
-                                z[1,30] = importances["importances_std"][6]
-                                z[1,31] = importances["importances_std"][7]
-                                z[1,32] = importances["importances_std"][8]
-                                println(z[end, :])
+                                z[1,16] = importances["importances_mean"][1]
+                                z[1,17] = importances["importances_mean"][2]
+                                z[1,18] = importances["importances_mean"][3]
+                                z[1,19] = importances["importances_mean"][4]
+                                z[1,20] = importances["importances_mean"][5]
+                                z[1,21] = importances["importances_mean"][6]
+                                z[1,22] = importances["importances_mean"][7]
+                                z[1,23] = importances["importances_mean"][8]
+                                z[1,24] = importances["importances_mean"][9]
+                                z[1,25] = importances["importances_mean"][10]
+                                z[1,26] = importances["importances_mean"][11]
+                                z[1,27] = importances["importances_mean"][12]
+                                z[1,28] = importances["importances_mean"][13]
+                                z[1,29] = importances["importances_mean"][14]
+                                z[1,30] = importances["importances_mean"][15]
+                                z[1,31] = importances["importances_mean"][16]
+                                z[1,32] = importances["importances_mean"][17]
+                                z[1,33] = importances["importances_mean"][18]
+                                z[1,34] = importances["importances_std"][1]
+                                z[1,35] = importances["importances_std"][2]
+                                z[1,36] = importances["importances_std"][3]
+                                z[1,37] = importances["importances_std"][4]
+                                z[1,38] = importances["importances_std"][5]
+                                z[1,39] = importances["importances_std"][6]
+                                z[1,40] = importances["importances_std"][7]
+                                z[1,41] = importances["importances_std"][8]
+                                z[1,42] = importances["importances_std"][9]
+                                z[1,43] = importances["importances_std"][10]
+                                z[1,44] = importances["importances_std"][11]
+                                z[1,45] = importances["importances_std"][12]
+                                z[1,46] = importances["importances_std"][13]
+                                z[1,47] = importances["importances_std"][14]
+                                z[1,48] = importances["importances_std"][15]
+                                z[1,49] = importances["importances_std"][16]
+                                z[1,50] = importances["importances_std"][17]
+                                z[1,51] = importances["importances_std"][18]
                             else
                                 itrain = f1_score(Vector(mm_train), predict(reg, Matrix(nn_train)), sample_weight=sampleW)
                                 jtrain = matthews_corrcoef(Vector(mm_train), predict(reg, Matrix(nn_train)), sample_weight=sampleW)
-                                ival = f1_score(Vector(Yy_val), predict(reg, Matrix(Xx_val)), sample_weight=sampletestW)
-                                jval = matthews_corrcoef(Vector(Yy_val), predict(reg, Matrix(Xx_val)), sample_weight=sampletestW)
+                                ival = f1_score(Vector(Yy_Ext), predict(reg, Matrix(Xx_Ext)), sample_weight=sampleExtW)
+                                jval = matthews_corrcoef(Vector(Yy_Ext), predict(reg, Matrix(Xx_Ext)), sample_weight=sampleExtW)
                                 println("## CV ##")
                                 f1_10_train = cross_val_score(reg, Matrix(Xx_train), Vector(Yy_train); cv = 3, scoring=f1)
                                 traincvtrain = avgScore(f1_10_train, 3) 
-                                f1s = f1_score(Vector(Yy_test), predict(reg, Matrix(Xx_test)), sample_weight=samplepestW)
-                                mccs = matthews_corrcoef(Vector(Yy_test), predict(reg, Matrix(Xx_test)), sample_weight=samplepestW)
-                                rec = recall_score(Vector(Yy_test2), predict(reg, Matrix(Xx_test2)))
+                                f1s = f1_score(Vector(Yy_FNA), predict(reg, Matrix(Xx_FNA)), sample_weight=sampleFNAW)
+                                mccs = matthews_corrcoef(Vector(Yy_FNA), predict(reg, Matrix(Xx_FNA)), sample_weight=sampleFNAW)
+                                rec = recall_score(Vector(Yy_FNA), predict(reg, Matrix(Xx_FNA)))
                                 im1 = importances["importances_mean"][1]
                                 im2 = importances["importances_mean"][2]
                                 im3 = importances["importances_mean"][3]
@@ -1163,6 +1179,16 @@ function optimMLP(inputDB, inputDB_test, inputDB_pest, inputDB_pest2)
                                 im6 = importances["importances_mean"][6]
                                 im7 = importances["importances_mean"][7]
                                 im8 = importances["importances_mean"][8]
+                                im9 = importances["importances_mean"][9]
+                                im10 = importances["importances_mean"][10]
+                                im11 = importances["importances_mean"][11]
+                                im12 = importances["importances_mean"][12]
+                                im13 = importances["importances_mean"][13]
+                                im14 = importances["importances_mean"][14]
+                                im15 = importances["importances_mean"][15]
+                                im16 = importances["importances_mean"][16]
+                                im17 = importances["importances_mean"][17]
+                                im18 = importances["importances_mean"][18]
                                 sd1 = importances["importances_std"][1]
                                 sd2 = importances["importances_std"][2]
                                 sd3 = importances["importances_std"][3]
@@ -1171,7 +1197,17 @@ function optimMLP(inputDB, inputDB_test, inputDB_pest, inputDB_pest2)
                                 sd6 = importances["importances_std"][6]
                                 sd7 = importances["importances_std"][7]
                                 sd8 = importances["importances_std"][8]
-                                z = vcat(z, [hls it alph act sol lr itrain jtrain ival jval traincvtrain f1s mccs rec rs mod im1 im2 im3 im4 im5 im6 im7 im8 sd1 sd2 sd3 sd4 sd5 sd6 sd7 sd8])
+                                sd9 = importances["importances_std"][9]
+                                sd10 = importances["importances_std"][10]
+                                sd11 = importances["importances_std"][11]
+                                sd12 = importances["importances_std"][12]
+                                sd13 = importances["importances_std"][13]
+                                sd14 = importances["importances_std"][14]
+                                sd15 = importances["importances_std"][15]
+                                sd16 = importances["importances_std"][16]
+                                sd17 = importances["importances_std"][17]
+                                sd18 = importances["importances_std"][18]
+                                z = vcat(z, [hls it alpha act sol lr itrain jtrain ival jval traincvtrain f1s mccs rec rs im1 im2 im3 im4 im5 im6 im7 im8 im9 im10 im11 im12 im13 im14 im15 im16 im17 im18 sd1 sd2 sd3 sd4 sd5 sd6 sd7 sd8 sd9 sd10 sd11 sd12 sd13 sd14 sd15 sd16 sd17 sd18])
                                 println(z[end, :])
                             end
                             println("End of ", itr, " iterations")
@@ -1182,14 +1218,14 @@ function optimMLP(inputDB, inputDB_test, inputDB_pest, inputDB_pest2)
             end
         end
     end
-    z_df = DataFrame(layers = z[:,1], maxIt = z[:,2], alpha = z[:,3], act = z[:,4], solver = z[:,5], lr = z[:,6], f1_train = z[:,7], mcc_train = z[:,8], f1_val = z[:,9], mcc_val = z[:,10], f1_3Ftrain = z[:,11], f1_pest = z[:,12], mcc_pest = z[:,13], recall = z[:,14], state = z[:,15], model = z[:,16], im1 = z[:,17], im2 = z[:,18], im3 = z[:,19], im4 = z[:,20], im5 = z[:,21], im6 = z[:,22], im7 = z[:,23], im8 = z[:,24], sd1 = z[:,25], sd2 = z[:,26], sd3 = z[:,27], sd4 = z[:,28], sd5 = z[:,29], sd6 = z[:,30], sd7 = z[:,31], sd8 = z[:,32])
-    z_df_sorted = sort(z_df, [:recall, :f1_pest, :f1_3Ftrain], rev=true)
+    z_df = DataFrame(hls = z[:,1], it = z[:,2], alpha = z[:,3], act = z[:,4], sol = z[:,5], lr = z[:,6], f1_train = z[:,7], mcc_train = z[:,8], f1_ext = z[:,9], mcc_ext = z[:,10], f1_3Ftrain = z[:,11], f1_fna = z[:,12], mcc_fna = z[:,13], recall = z[:,14], state = z[:,15], im1 = z[:,16], im2 = z[:,17], im3 = z[:,18], im4 = z[:,19], im5 = z[:,20], im6 = z[:,21], im7 = z[:,22], im8 = z[:,23], im9 = z[:,24], im10 = z[:,25], im11 = z[:,26], im12 = z[:,27], im13 = z[:,28], im14 = z[:,29], im15 = z[:,30], im16 = z[:,31], im17 = z[:,32], im18 = z[:,33], sd1 = z[:,34], sd2 = z[:,35], sd3 = z[:,36], sd4 = z[:,37], sd5 = z[:,38], sd6 = z[:,39], sd7 = z[:,40], sd8 = z[:,41], sd9 = z[:,42], sd10 = z[:,43], sd11 = z[:,44], sd12 = z[:,45], sd13 = z[:,46], sd14 = z[:,47], sd15 = z[:,48], sd16 = z[:,49], sd17 = z[:,50], sd18 = z[:,51])
+    z_df_sorted = sort(z_df, [:recall, :f1_fna, :f1_3Ftrain], rev=true)
     return z_df_sorted
 end
 
 ## call Multi-Layer Perceptrons ##
-optiSearch_df = optimMLP(trainDEFSDf, testDEFSDf, noTeaDEFSDf, TeaDEFSDf)
+optiSearch_df = optimMLP(trainDEFSDf, ingestedDEFSDf, extDEFSDf, fnaDEFSDf)
 
 # save, ouputing 180 x 8 df
-savePath = "F:\\UvA\\app\\hyperparameterTuning_modelSelection_MLP(0)_noFilter.csv"
+savePath = "G:\\raMSIn\\XGB_Importance2\\hyperparameterTuning_modelSelection_MLP1.csv"
 CSV.write(savePath, optiSearch_df)
