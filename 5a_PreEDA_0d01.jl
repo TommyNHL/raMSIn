@@ -1,7 +1,7 @@
 VERSION
 ## install packages needed ##
 using Pkg
-#Pkg.add("ScikitLearn")
+#Pkg.add("filter")
 #Pkg.add(PackageSpec(url=""))
 
 ## import packages from Julia ##
@@ -22,6 +22,17 @@ push!(top18_4clusters, "type")
 df24_train = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSI_HKU_Ingested4FNA\\0_cbMSI_0d01\\df0d01_ROI4_for_ML_Opti_train.csv", DataFrame)[:, top18_4clusters]
 df24_ext = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSI_HKU_Ingested4FNA\\0_cbMSI_0d01\\df0d01_ROI4_for_ML_Opti_ext.csv", DataFrame)[:, top18_4clusters]
 df24_FNA = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSI_HKU_Ingested4FNA\\0_cbMSI_0d01\\df0d01_ROI4_for_ML_Opti_FNA.csv", DataFrame)[:, top18_4clusters]
+
+df_pixels_train = CSV.read("H:\\3_output_raMSIn\\df_train24.csv", DataFrame)
+pixels_train = Array(df_pixels_train[:, "pixel_id"])
+df_pixels_ext = CSV.read("H:\\3_output_raMSIn\\df_ext24.csv", DataFrame)
+pixels_ext = Array(df_pixels_ext[:, "pixel_id"])
+df_pixels_FNA = CSV.read("H:\\3_output_raMSIn\\df_FNA24.csv", DataFrame)
+pixels_FNA = Array(df_pixels_FNA[:, "pixel_id"])
+
+df24_train = df24_train[in.(df24_train.pixel_id, (pixels_train,)), :]
+df24_ext = df24_ext[in.(df24_ext.pixel_id, (pixels_ext,)), :]
+df24_FNA = df24_FNA[in.(df24_FNA.pixel_id, (pixels_FNA,)), :]
 
 savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSI_HKU_Ingested4FNA\\0_cbMSI_0d01\\df0d01_train24.csv"
 CSV.write(savePath, df24_train)
@@ -60,7 +71,7 @@ savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSI_HKU_Ingested4FNA\\0_cbMSI_0d01
 CSV.write(savePath, df24_train)
 
 df24_train[df24_train.type.== 1, :]
-# 0: 94900; 1: 87023
+# 0: 47449; 1: 43511
 
 
 # ==================================================================================================
@@ -92,7 +103,7 @@ savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSI_HKU_Ingested4FNA\\0_cbMSI_0d01
 CSV.write(savePath, df24_ext)
 
 df24_ext[df24_ext.type.== 1, :]
-# 0: 5887; 1: 6265
+# 0: 2943; 1: 3132
 
 
 # ==================================================================================================
@@ -124,4 +135,4 @@ savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSI_HKU_Ingested4FNA\\0_cbMSI_0d01
 CSV.write(savePath, df24_FNA)
 
 df24_FNA[df24_FNA.type.== 1, :]
-# 0: 89081; 1: 88324
+# 0: 44540; 1: 44161

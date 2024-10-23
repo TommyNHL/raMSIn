@@ -23,6 +23,15 @@ df24_top18 = CSV.read("H:\\3_output_raMSIn\\noSTDtop18_5ppm.csv", DataFrame)
     df24_ext = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSI_HKU_Ingested4FNA\\0_dbMSI_5ppm\\df5ppm_ROI4_for_ML_Opti_ext.csv", DataFrame)[:,top18_4clusters]
     df24_FNA = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSI_HKU_Ingested4FNA\\0_dbMSI_5ppm\\df5ppm_ROI4_for_ML_Opti_FNA.csv", DataFrame)[:,top18_4clusters]
 
+    df_pixels_train = CSV.read("H:\\3_output_raMSIn\\df_train24.csv", DataFrame)
+    pixels_train = Array(df_pixels_train[:, "pixel_id"])
+    df_pixels_ext = CSV.read("H:\\3_output_raMSIn\\df_ext24.csv", DataFrame)
+    pixels_ext = Array(df_pixels_ext[:, "pixel_id"])
+    
+    df24_train = df24_train[in.(df24_train.pixel_id, (pixels_train,)), :]
+    df24_ext = df24_ext[in.(df24_ext.pixel_id, (pixels_ext,)), :]
+    df24_FNA = df24_FNA[in.(df24_FNA.pixel_id, (pixels_FNA,)), :]
+
     savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSI_HKU_Ingested4FNA\\0_dbMSI_5ppm\\df5ppm_train24.csv"
     CSV.write(savePath, df24_train)
     savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSI_HKU_Ingested4FNA\\0_dbMSI_5ppm\\df5ppm_ext24.csv"
