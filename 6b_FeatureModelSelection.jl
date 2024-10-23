@@ -1068,7 +1068,7 @@ CSV.write(savePath, optiSearch_df)
 ## define a function for Multi-Layer Perceptrons ##
 function optimMLP(inputDB, inputDB_ingested, inputDB_ext, inputDB_FNA)
     hls_r = [(8,8,8), (8,16,8), (8,16,16), (16,16,16), (16,16,8), (16,8,8), (16,8,16), (8,16,16)]  # 8
-    maxIter_r = vcat(125, 150, 200, 250, 300, 400, 500)  # 7
+    maxIter_r = vcat(125, 150, 200, 250, 300)  # 5
     alpha_r = [0.0001, 0.05]  # 2
     act_r = ["tanh", "relu"]  # 2
     solver_r = ["sgd", "adam"]  # 2
