@@ -27,7 +27,9 @@ df24_top18 = CSV.read("H:\\3_output_raMSIn\\noSTDtop18_5ppm.csv", DataFrame)
     pixels_train = Array(df_pixels_train[:, "pixel_id"])
     df_pixels_ext = CSV.read("H:\\3_output_raMSIn\\df_ext24.csv", DataFrame)
     pixels_ext = Array(df_pixels_ext[:, "pixel_id"])
-    
+    df_pixels_FNA = CSV.read("H:\\3_output_raMSIn\\df_FNA24.csv", DataFrame)
+    pixels_FNA = Array(df_pixels_FNA[:, "pixel_id"])
+
     df24_train = df24_train[in.(df24_train.pixel_id, (pixels_train,)), :]
     df24_ext = df24_ext[in.(df24_ext.pixel_id, (pixels_ext,)), :]
     df24_FNA = df24_FNA[in.(df24_FNA.pixel_id, (pixels_FNA,)), :]
@@ -132,5 +134,5 @@ size(df24_FNA, 2)
     savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSI_HKU_Ingested4FNA\\0_dbMSI_5ppm\\df5ppm_FNA24_std.csv"
     CSV.write(savePath, df24_FNA)
     
-    df24_FNA[df24_FNA.type .== 1, :]
+    df24_FNA[df24_FNA.type .== 0, :]
     # 0: 44540; 1: 44161
