@@ -11,7 +11,7 @@ using ScikitLearn
 using ScikitLearn.CrossValidation: train_test_split
 
 ## import all data ##
-df24_top18 = CSV.read("H:\\3_output_raMSIn\\noSTDtop18_noningestedFNA.csv", DataFrame)
+df24_top18 = CSV.read("H:\\3_output_raMSIn\\noSTDtop18_NonInFNA.csv", DataFrame)
     top18_4clusters_ = df24_top18[:,2]
     top18_4clusters = ["pixel_id"]
     for top in top18_4clusters_
@@ -26,7 +26,7 @@ df24_top18 = CSV.read("H:\\3_output_raMSIn\\noSTDtop18_noningestedFNA.csv", Data
     end
     push!(pop, "type")
 
-    df24_FNA = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_NonInFNA\\df_ROI4_for_ML_Opti_noningestedFNA.csv", DataFrame)
+    df24_FNA = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_NonIn\\df_ROI4_for_ML_Opti_NonInFNA_all.csv", DataFrame)
     df_FNA = DataFrame(df24_FNA[:, top18_4clusters[vcat(1,end)]])
     
     count = 2
@@ -44,7 +44,7 @@ df24_top18 = CSV.read("H:\\3_output_raMSIn\\noSTDtop18_noningestedFNA.csv", Data
     end
     describe(df_FNA)
 
-    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_NonInFNA\\df_noningestedFNA24.csv"
+    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_NonIn\\df_NonInFNA24_all.csv"
     CSV.write(savePath, df_FNA)
 
 
@@ -60,7 +60,7 @@ size(df_FNA, 2)
     describe(df_FNA)
 
     ## save ##
-    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_NonInFNA\\df_noningstedFNA24_log.csv"
+    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_NonIn\\df_NonInFNA24_alllog.csv"
     CSV.write(savePath, df_FNA)
 
     for f in 2:size(df_FNA, 2)-1
@@ -77,8 +77,8 @@ size(df_FNA, 2)
     end
     describe(df_FNA)
     ## save ##
-    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_NonInFNA\\df_noningestedFNA24_std.csv"
+    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_NonIn\\df_NonInFNA24_allstd.csv"
     CSV.write(savePath, df_FNA)
     
-    df_FNA[df_FNA.type .== 0, :]
-    # 0: 44540; 1: 40783
+    df_FNA[df_FNA.type .== 1, :]
+    # 0: 44540; 1: 10302
