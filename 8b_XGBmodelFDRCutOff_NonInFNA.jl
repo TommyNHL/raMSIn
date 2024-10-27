@@ -40,7 +40,7 @@ make_scorer = pyimport("sklearn.metrics").make_scorer
 f1 = make_scorer(f1_score, pos_label=1, average="binary")
 
 ## input ## predicted0n1, p(0), p(1)
-fnaDEFSDf = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_NonIn\\df_NonInFNA24_allstd_0n1_pTP.csv", DataFrame)
+fnaDEFSDf = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_NonIn2\\df_NonIn2FNA24_allstd_0n1_pTP.csv", DataFrame)
 
 # ==================================================================================================
 ## prepare to plot confusion matrix for FNA set ##
@@ -72,7 +72,7 @@ fnaDEFSDf[!, "CM"] .= String("")
     CM_FNAWith[1, 1] = fnaDEFSDf_FN
 
 ## save ##
-savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_NonIn\\df_NonInFNA24_allstd_0n1_postPredict.csv"
+savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_NonIn2\\df_NonIn2FNA24_allstd_0n1_postPredict.csv"
 CSV.write(savePath, fnaDEFSDf)
 
 
@@ -82,7 +82,7 @@ default(grid = false, legend = false)
 gr()
 FNAOutplotCM = plot(size = (650, 600), margin = (10, :mm), dpi = 300)
 heatmap!(["1", "0"], ["0", "1"], CM_FNAWith, cmap = :viridis, cbar = :true, 
-        clims = (0, 40000), 
+        clims = (0, 13000), 
         xlabel = "Expected", xguidefontsize=16, 
         ylabel = "Predicted", yguidefontsize=16, 
         xtickfontsize = 12, 
@@ -91,11 +91,11 @@ heatmap!(["1", "0"], ["0", "1"], CM_FNAWith, cmap = :viridis, cbar = :true,
         titlefont = font(16), 
         size = (650,600), 
         dpi = 300)
-        annotate!(["1"], ["1"], ["TP\n9,758"], font(color="white"))
-        annotate!(["0"], ["1"], ["FP\n9,296"], font(color="white"))
-        annotate!(["1"], ["0"], ["FN\n544"], font(color="white"))
-        annotate!(["0"], ["0"], ["TN\n35,244"])
-savefig(FNAOutplotCM, "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_NonIn\\prediction_NonInFNACM_all.png")
+        annotate!(["1"], ["1"], ["TP\n9,806"])
+        annotate!(["0"], ["1"], ["FP\n1,891"], font(color="white"))
+        annotate!(["1"], ["0"], ["FN\n496"], font(color="white"))
+        annotate!(["0"], ["0"], ["TN\n12,572"])
+savefig(FNAOutplotCM, "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_NonIn2\\prediction_NonInFNA2CM_all.png")
 
 
 # ==================================================================================================
@@ -167,7 +167,7 @@ savefig(FNAOutplotCM, "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_NonIn\\predict
     fnaDEFSDf[!, "TNR"] = FNA_TNR
 
 ## save ##
-savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_NonIn\\postPredict_tPRfNRfDR_NonInFNA_all.csv"
+savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_NonIn2\\postPredict_tPRfNRfDR_NonInFNA2_all.csv"
 CSV.write(savePath, fnaDEFSDf)
 
 
@@ -206,5 +206,5 @@ plot!(fnaDEFSDf[:, end-6], fnaDEFSDf[:, end-2],
         new_yticks2 = ([0.10], ["\$\\bar"], ["red"])
         hline!(new_yticks[1], label = "5% FDR-Controlled Cutoff at P(1) = 1.00", legendfont = font(10), lc = "purple", subplot = 2)
         hline!(new_yticks2[1], label = "10% FDR-Controlled Cutoff at P(1) = 1.00", legendfont = font(10), lc = "red", subplot = 2)
-savefig(FNAOutplotP1toRate, "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_NonIn\\prediction_P1threshold2TPRFNRFDR_all.png")
+savefig(FNAOutplotP1toRate, "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_NonIn2\\prediction2_P1threshold2TPRFNRFDR_all.png")
 
