@@ -11,36 +11,55 @@ using ScikitLearn
 using ScikitLearn.CrossValidation: train_test_split
 
 ## import all data ##
-df24_top18 = CSV.read("H:\\3_output_raMSIn\\noSTDtop18_5ppm.csv", DataFrame)
-    top18_4clusters_ = df24_top18[:,2]
-    top18_4clusters = ["pixel_id"]
-    for top in top18_4clusters_
-        push!(top18_4clusters, string(top))
+df24_top17 = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\noSTDtop17_dbMSIn5ppm.csv", DataFrame)
+    top17_4clusters_ = df24_top17[:,2]
+    top17_4clusters = ["pixel_id"]
+    for top in top17_4clusters_
+        push!(top17_4clusters, string(top))
     end
-    push!(top18_4clusters, "type")
+    push!(top17_4clusters, "type")
 
-    df24_train = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSI_HKU_Ingested4FNA\\0_dbMSI_5ppm\\df5ppm_ROI4_for_ML_Opti_train.csv", DataFrame)[:,top18_4clusters]
-    df24_ext = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSI_HKU_Ingested4FNA\\0_dbMSI_5ppm\\df5ppm_ROI4_for_ML_Opti_ext.csv", DataFrame)[:,top18_4clusters]
-    df24_FNA = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSI_HKU_Ingested4FNA\\0_dbMSI_5ppm\\df5ppm_ROI4_for_ML_Opti_FNA.csv", DataFrame)[:,top18_4clusters]
+    df24_train = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSI_HKU_Ingested4FNA\\0_dbMSI_5ppm\\df5ppm_ROI4_for_ML_Opti_train.csv", DataFrame)[:,top17_4clusters]
+    df24_ext = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSI_HKU_Ingested4FNA\\0_dbMSI_5ppm\\df5ppm_ROI4_for_ML_Opti_ext.csv", DataFrame)[:,top17_4clusters]
+    df24_ingested = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSI_HKU_Ingested4FNA\\0_dbMSI_5ppm\\df5ppm_ROI4_for_ML_Opti_ingested.csv", DataFrame)[:,top17_4clusters]
+   df24_FNA = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSI_HKU_Ingested4FNA\\0_dbMSI_5ppm\\df5ppm_ROI4_for_ML_Opti_FNA.csv", DataFrame)[:,top17_4clusters] 
 
-    df_pixels_train = CSV.read("H:\\3_output_raMSIn\\df_train24.csv", DataFrame)
+    df_pixels_train = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_train_raMSIn4nonInDI.csv", DataFrame)
     pixels_train = Array(df_pixels_train[:, "pixel_id"])
-    df_pixels_ext = CSV.read("H:\\3_output_raMSIn\\df_ext24.csv", DataFrame)
+    df_pixels_ext = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_ext_raMSIn4nonInDI.csv", DataFrame)
     pixels_ext = Array(df_pixels_ext[:, "pixel_id"])
-    df_pixels_FNA = CSV.read("H:\\3_output_raMSIn\\df_FNA24.csv", DataFrame)
+    df_pixels_ingested = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_ingested_raMSIn4nonInDI.csv", DataFrame)
+    pixels_ingested = Array(df_pixels_ingested[:, "pixel_id"])
+    df_pixels_FNA = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_FNA_raMSIn4nonInDI.csv", DataFrame)
     pixels_FNA = Array(df_pixels_FNA[:, "pixel_id"])
-
+    
     df24_train = df24_train[in.(df24_train.pixel_id, (pixels_train,)), :]
     df24_ext = df24_ext[in.(df24_ext.pixel_id, (pixels_ext,)), :]
+    df24_ingested = df24_ingested[in.(df24_ingested.pixel_id, (pixels_ingested,)), :]
     df24_FNA = df24_FNA[in.(df24_FNA.pixel_id, (pixels_FNA,)), :]
 
-    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSI_HKU_Ingested4FNA\\0_dbMSI_5ppm\\df5ppm_train24.csv"
+    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_train_dbMSIn5ppm4nonInDI.csv"
     CSV.write(savePath, df24_train)
-    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSI_HKU_Ingested4FNA\\0_dbMSI_5ppm\\df5ppm_ext24.csv"
+    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_ext_dbMSIn5ppm4nonInDI.csv"
     CSV.write(savePath, df24_ext)
-    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSI_HKU_Ingested4FNA\\0_dbMSI_5ppm\\df5ppm_FNA24.csv"
+    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_ingested_dbMSIn5ppm4nonInDI.csv"
+    CSV.write(savePath, df24_ingested)
+    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_FNA_dbMSIn5ppm4nonInDI.csv"
     CSV.write(savePath, df24_FNA)
 
+
+df22_top17 = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\noSTDtop17_dbMSIn5ppm_nonInDI.csv", DataFrame)
+    top17_2clusters_ = df22_top17[:,2]
+    top17_2clusters = ["pixel_id"]
+    for top in top17_2clusters_
+        push!(top17_2clusters, string(top))
+    end
+    push!(top17_2clusters, "type")
+    
+    df22_DI = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSI_HKU_DirectIn\\0_dbMSI_5ppm\\df5ppm_ROI_for_ML_Opti_DirectIn.csv", DataFrame)[:,top17_2clusters]
+
+    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_nonInDI_dbMSIn5ppm4nonInDI.csv"
+    CSV.write(savePath, df22_DI)
 
 # ==================================================================================================
 ## prepare training set ##
@@ -54,7 +73,7 @@ size(df24_train, 2)
     describe(df24_train)
 
     ## save ##
-    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSI_HKU_Ingested4FNA\\0_dbMSI_5ppm\\df5ppm_train24_log.csv"
+    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_train_dbMSIn5ppm4nonInDI_log.csv"
     CSV.write(savePath, df24_train)
 
     for f in 2:size(df24_train, 2)-1
@@ -67,12 +86,11 @@ size(df24_train, 2)
     end
     describe(df24_train)
     ## save ##
-    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSI_HKU_Ingested4FNA\\0_dbMSI_5ppm\\df5ppm_train24_std.csv"
+    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_train_dbMSIn5ppm4nonInDI_norm.csv"
     CSV.write(savePath, df24_train)
     
     df24_train[df24_train.type .== 1, :]
     # 0: 47449; 1: 43511
-
 
 # ==================================================================================================
 ## prepare ext val set ##
@@ -86,7 +104,7 @@ size(df24_ext, 2)
     describe(df24_ext)
 
     ## save ##
-    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSI_HKU_Ingested4FNA\\0_dbMSI_5ppm\\df5ppm_ext24_log.csv"
+    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_ext_dbMSIn5ppm4nonInDI_log.csv"
     CSV.write(savePath, df24_ext)
 
     for f in 2:size(df24_ext, 2)-1
@@ -99,12 +117,42 @@ size(df24_ext, 2)
     end
     describe(df24_ext)
     ## save ##
-    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSI_HKU_Ingested4FNA\\0_dbMSI_5ppm\\df5ppm_ext24_std.csv"
+    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_ext_dbMSIn5ppm4nonInDI_norm.csv"
     CSV.write(savePath, df24_ext)
     
     df24_ext[df24_ext.type .== 1, :]
     # 0: 2943; 1: 3132
 
+# ==================================================================================================
+## prepare ingested set ##
+size(df24_ingested, 2)
+    for row = 1:size(df24_ingested, 1)
+        for col = 2:size(df24_ingested, 2)-1
+            df24_ingested[row, col] = sqrt(df24_ingested[row, col])
+            #df24_ingested[row, col] = log10(df24_ingested[row, col])
+        end
+    end
+    describe(df24_ingested)
+
+    ## save ##
+    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_ingested_dbMSIn5ppm4nonInDI_log.csv"
+    CSV.write(savePath, df24_ingested)
+
+    for f in 2:size(df24_ingested, 2)-1
+        avg = float(mean(df24_ingested[:, f]))
+        top = float(maximum(df24_ingested[:, f]))
+        down = float(minimum(df24_ingested[:, f]))
+        for i = 1:size(df24_ingested, 1)
+            df24_ingested[i, f] = (df24_ingested[i, f] - avg) / (top - down)
+        end
+    end
+    describe(df24_ingested)
+    ## save ##
+    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_ingested_dbMSIn5ppm4nonInDI_norm.csv"
+    CSV.write(savePath, df24_ingested)
+    
+    df24_ingested[df24_ingested.type .== 1, :]
+    # 0: 50392; 1: 46643
 
 # ==================================================================================================
 # prepare FNA set
@@ -118,7 +166,7 @@ size(df24_FNA, 2)
     describe(df24_FNA)
 
     ## save ##
-    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSI_HKU_Ingested4FNA\\0_dbMSI_5ppm\\df5ppm_FNA24_log.csv"
+    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_FNA_dbMSIn5ppm4nonInDI_log.csv"
     CSV.write(savePath, df24_FNA)
 
     for f in 2:size(df24_FNA, 2)-1
@@ -131,8 +179,39 @@ size(df24_FNA, 2)
     end
     describe(df24_FNA)
     ## save ##
-    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSI_HKU_Ingested4FNA\\0_dbMSI_5ppm\\df5ppm_FNA24_std.csv"
+    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_FNA_dbMSIn5ppm4nonInDI_norm.csv"
     CSV.write(savePath, df24_FNA)
     
-    df24_FNA[df24_FNA.type .== 0, :]
+    df24_FNA[df24_FNA.type .== 1, :]
     # 0: 44540; 1: 44161
+
+# ==================================================================================================
+# prepare DirectIn set
+size(df22_DI, 2)
+    for row = 1:size(df22_DI, 1)
+        for col = 2:size(df22_DI, 2)-1
+            df22_DI[row, col] = sqrt(df22_DI[row, col])
+            #df22_DI[row, col] = log10(df22_DI[row, col])
+        end
+    end
+    describe(df22_DI)
+
+    ## save ##
+    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_nonInDI_dbMSIn5ppm4nonInDI_log.csv"
+    CSV.write(savePath, df22_DI)
+
+    for f in 2:size(df22_DI, 2)-1
+        avg = float(mean(df22_DI[:, f]))
+        top = float(maximum(df22_DI[:, f]))
+        down = float(minimum(df22_DI[:, f]))
+        for i = 1:size(df22_DI, 1)
+            df22_DI[i, f] = (df22_DI[i, f] - avg) / (top - down)
+        end
+    end
+    describe(df22_DI)
+    ## save ##
+    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_nonInDI_dbMSIn5ppm4nonInDI_norm.csv"
+    CSV.write(savePath, df22_DI)
+    
+    df22_DI[df22_DI.type .== 1, :]
+    # 0: 3027; 1: 3030
