@@ -686,17 +686,17 @@ CSV.write(savePath, optiSearch_df)
 # ==================================================================================================
 ## define a function for Gradient Boost ##
 function optimGradientBoostClass(inputDB, inputDB_ingested, inputDB_ext, inputDB_FNA, inputDB_di)
-    lr_r = vcat(0.3, 0.1)  # 2
-    #lr_r = vcat(0.3, 0.2, 0.1)  # 3
-    leaf_r = vcat(8, 12, 18)  # 3
-    #leaf_r = vcat(18, 24)  # 2
-    depth_r = vcat(collect(6:2:10))  # 3
-    #depth_r = vcat(collect(8:2:12))  # 3
-    split_r = vcat(collect(10:10:20))  # 2
+    #lr_r = vcat(0.3, 0.1)  # 2
+    lr_r = vcat(0.5, collect(1:2:9))  # 6
+    #leaf_r = vcat(8, 12, 18)  # 3
+    leaf_r = vcat(collect(2:4:10))  # 3
+    #depth_r = vcat(collect(6:2:10))  # 3
+    depth_r = vcat(collect(4:1:8))  # 5
     #split_r = vcat(collect(10:10:20))  # 2
+    split_r = vcat(collect(15:15:30))  # 2
     #split_r = vcat(collect(10:5:25))  # 4
-    tree_r = vcat(collect(50:100:250))  # 3
-    #tree_r = vcat(collect(25:25:75))  # 3
+    #tree_r = vcat(collect(50:100:250))  # 3
+    tree_r = vcat(collect(25:25:75))  # 3
     
     rs = 42
     z = zeros(1,37)
@@ -825,5 +825,5 @@ end
 optiSearch_df = optimGradientBoostClass(trainDEFSDf, ingestedDEFSDf, extDEFSDf, fnaDEFSDf, diDEFSDf)
 
 ## save ##
-savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\modeling\\hyperparameterTuning_modelSelection_GBM1.csv"
+savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\modeling\\hyperparameterTuning_modelSelection_GBM2.csv"
 CSV.write(savePath, optiSearch_df)
