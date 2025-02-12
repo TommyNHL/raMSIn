@@ -7,8 +7,8 @@ using Pkg
 ## import packages from Julia ##
 import Conda
 Conda.PYTHONDIR
-#ENV["PYTHON"] = raw"C:\Users\T1208\AppData\Local\Programs\Python\Python311\python.exe"  # python 3.11
-ENV["PYTHON"] = raw"C:\Users\user\AppData\Local\Programs\Python\Python311\python.exe"  # python 3.11
+ENV["PYTHON"] = raw"C:\Users\T1208\AppData\Local\Programs\Python\Python311\python.exe"  # python 3.11
+#ENV["PYTHON"] = raw"C:\Users\user\AppData\Local\Programs\Python\Python311\python.exe"  # python 3.11
 Pkg.build("PyCall")
 Pkg.status()
 using Random
@@ -41,7 +41,7 @@ make_scorer = pyimport("sklearn.metrics").make_scorer
 f1 = make_scorer(f1_score, pos_label=1, average="binary")
 
 ## input training set ## 90960 x 20 df
-trainDEFSDf = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_train_raMSIn4nonInDI_norm.csv", DataFrame)
+trainDEFSDf = CSV.read("C:\\Users\\T1208\\PyLAB\\raMSIn\\df_train_raMSIn4nonInDI_norm.csv", DataFrame)
 trainDEFSDf = trainDEFSDf[:, vcat(1, collect(2:9), 16, 17, end)]
 trainDEFSDf[trainDEFSDf.type .== 1, :]
     ## calculate weight ## 0: 47449, 1: 43511
@@ -56,7 +56,7 @@ trainDEFSDf[trainDEFSDf.type .== 1, :]
     end 
 
 ## input ext val set ## 6075 x 20 df
-extDEFSDf = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_ext_raMSIn4nonInDI_norm.csv", DataFrame)
+extDEFSDf = CSV.read("C:\\Users\\T1208\\PyLAB\\raMSIn\\df_ext_raMSIn4nonInDI_norm.csv", DataFrame)
 extDEFSDf = extDEFSDf[:, vcat(1, collect(2:9), 16, 17, end)]
 extDEFSDf[extDEFSDf.type .== 1, :]
     ## calculate weight ## 0: 2943, 1: 3132
@@ -71,7 +71,7 @@ extDEFSDf[extDEFSDf.type .== 1, :]
     end 
 
 ## reconstruct a whole set ## 97035 x 20 df
-ingestedDEFSDf = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_ingested_raMSIn4nonInDI_norm.csv", DataFrame)
+ingestedDEFSDf = CSV.read("C:\\Users\\T1208\\PyLAB\\raMSIn\\df_ingested_raMSIn4nonInDI_norm.csv", DataFrame)
 ingestedDEFSDf = ingestedDEFSDf[:, vcat(1, collect(2:9), 16, 17, end)]
 ingestedDEFSDf[ingestedDEFSDf.type .== 1, :]
     ## calculate weight ## 0: 50392, 1: 46643
@@ -86,7 +86,7 @@ ingestedDEFSDf[ingestedDEFSDf.type .== 1, :]
     end 
 
 ## input FNA set ## 88701 x 20 df
-fnaDEFSDf = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_FNA_raMSIn4nonInDI_norm.csv", DataFrame)
+fnaDEFSDf = CSV.read("C:\\Users\\T1208\\PyLAB\\raMSIn\\df_FNA_raMSIn4nonInDI_norm.csv", DataFrame)
 fnaDEFSDf = fnaDEFSDf[:, vcat(1, collect(2:9), 16, 17, end)]
 fnaDEFSDf[fnaDEFSDf.type .== 1, :]
     ## calculate weight ##  0: 44540, 1: 44161
@@ -101,7 +101,7 @@ fnaDEFSDf[fnaDEFSDf.type .== 1, :]
     end  
 
 ## input DirectIn set ## 88701 x 20 df
-diDEFSDf = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_nonInDI_raMSIn4nonInDI_norm.csv", DataFrame)
+diDEFSDf = CSV.read("C:\\Users\\T1208\\PyLAB\\raMSIn\\df_nonInDI_raMSIn4nonInDI_norm.csv", DataFrame)
 diDEFSDf = diDEFSDf[:, vcat(1, collect(2:9), 16, 17, end)]
 diDEFSDf[diDEFSDf.type .== 1, :]
     ## calculate weight ##  0: 3027, 1: 3030
@@ -409,9 +409,9 @@ CSV.write(savePath, optiSearch_df)
 function optimLR(inputDB, inputDB_ingested, inputDB_ext, inputDB_FNA, inputDB_di)
     penalty_r = ["l1", "l2"]  # 2
     solver_rs = ["newton-cg", "lbfgs", "liblinear", "sag", "saga"]  # 5
-    c_values_r = vcat(1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.075, 0.05, 0.025, 0.01)  # 14
-    #c_values_r = vcat(0.02, 0.01, 0.0075, 0.005, 0.0025, 0.001, 0.00075, 0.0005)  # 8
-    #c_values_r = vcat(0.0009, 0.0008, 0.0007, 0.0006, 0.0005, 0.0004, 0.0003, 0.0002, 0.0001, 0.000075, 0.00005, 0.000025, 0.00001)  # 13
+    #c_values_r = vcat(1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.075, 0.05, 0.025, 0.01)  # 14
+    #c_values_r = vcat(collect(0.01:0.01:0.05), collect(0.001:0.001:0.009), 0.00075, 0.0005)  # 8
+    c_values_r = vcat(collect(0.001:0.00025:0.00375), collect(0.0001:0.00005:0.00095), 0.00001, 0.000025, 0.00005, 0.000075)  # 13
 
     rs = 42
     z = zeros(1,35)
@@ -551,8 +551,9 @@ function optimSVM(inputDB, inputDB_ingested, inputDB_ext, inputDB_FNA, inputDB_d
     loss_r = ["hinge", "squared_hinge"]  # 2
     #gamma_r = ["scale", "auto"] # 2
     #kernel_r = ["linear", "poly", "rbf", "sigmoid"]  # 4
-    c_values_r = vcat(10, 5, 1.0, 0.5, 0.1, 0.05, 0.01, 0.005, 0.001, 0.0005, 0.0001, 0.00005, 0.00001, 0.000005, 0.000001)  # 15
-    #c_values_r = vcat(0.00009, 0.00008, 0.00007, 0.00006, 0.00005, 0.00004, 0.00003, 0.00002, 0.00001, 0.000009, 0.000008, 0.000007, 0.000006, 0.000005, 0.000004, 0.000003, 0.000002, 0.000001, 0.0000009, 0.0000008, 0.0000007, 0.0000006, 0.0000005, 0.0000004, 0.0000003, 0.0000002, 0.0000001)  # 15
+    #c_values_r = vcat(10, 5, 1.0, 0.5, 0.1, 0.05, 0.01, 0.005, 0.001, 0.0005, 0.0001, 0.00005, 0.00001, 0.000005, 0.000001)  # 15
+    #c_values_r = vcat(collect(0.1:0.05:50))  # 15
+    c_values_r = vcat(collect(50:0.5:500))  # 15
     
     rs = 42
     z = zeros(1,35)
@@ -687,16 +688,22 @@ CSV.write(savePath, optiSearch_df)
 ## define a function for Gradient Boost ##
 function optimGradientBoostClass(inputDB, inputDB_ingested, inputDB_ext, inputDB_FNA, inputDB_di)
     #lr_r = vcat(0.3, 0.1)  # 2
-    lr_r = vcat(0.5, collect(1:2:9))  # 6
+    #lr_r = vcat(0.5, collect(1:2:9))  # 6
+    #lr_r = vcat(collect(2:0.5:9))  # 15
+    lr_r = vcat(collect(3.5:0.1:4.5))  # 11
     #leaf_r = vcat(8, 12, 18)  # 3
-    leaf_r = vcat(collect(2:4:10))  # 3
+    #leaf_r = vcat(collect(2:4:10))  # 3
+    leaf_r = vcat(collect(2:1:8))  # 7
     #depth_r = vcat(collect(6:2:10))  # 3
-    depth_r = vcat(collect(4:1:8))  # 5
+    #depth_r = vcat(collect(4:1:8))  # 5
+    depth_r = vcat(collect(5:1:10))  # 6
     #split_r = vcat(collect(10:10:20))  # 2
-    split_r = vcat(collect(15:15:30))  # 2
-    #split_r = vcat(collect(10:5:25))  # 4
+    #split_r = vcat(collect(15:15:30))  # 2
+    #split_r = vcat(30)  # 1
+    split_r = vcat(10, 30, 50)  # 3
     #tree_r = vcat(collect(50:100:250))  # 3
-    tree_r = vcat(collect(25:25:75))  # 3
+    #tree_r = vcat(collect(25:25:75))  # 3
+    tree_r = vcat(50)  # 1
     
     rs = 42
     z = zeros(1,37)
@@ -825,5 +832,5 @@ end
 optiSearch_df = optimGradientBoostClass(trainDEFSDf, ingestedDEFSDf, extDEFSDf, fnaDEFSDf, diDEFSDf)
 
 ## save ##
-savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\modeling\\hyperparameterTuning_modelSelection_GBM2.csv"
+savePath = "C:\\Users\\T1208\\PyLAB\\raMSIn\\hyperparameterTuning_modelSelection_GBM4.csv"
 CSV.write(savePath, optiSearch_df)
