@@ -45,6 +45,7 @@ trainDEFSDf = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\
 extDEFSDf = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\df_ext_raMSIn_norm_0n1.csv", DataFrame)
 fnaDEFSDf = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\df_FNA_raMSIn_norm_0n1.csv", DataFrame)
 diDEFSDf = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\df_Di_raMSIn_norm_0n1.csv", DataFrame)
+cDEFSDf = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\df_Clinics2_raMSIn_norm_0n1.csv", DataFrame)
 
 # ==================================================================================================
 ## prepare to plot confusion matrix for training set ##
@@ -179,6 +180,40 @@ diDEFSDf[!, "CM"] .= String("")
 ## save ##
 savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\df_Di_raMSIn_norm_0n1_postPredict.csv"
 CSV.write(savePath, diDEFSDf)
+
+
+# ==================================================================================================
+## prepare to plot confusion matrix for Clinics set ##
+cDEFSDf[!, "CM"] .= String("")
+    cDEFSDf_TP = 0
+    cDEFSDf_FP = 0
+    cDEFSDf_TN = 0
+    cDEFSDf_FN = 0
+    for i in 1:size(cDEFSDf , 1)
+        if (cDEFSDf[i, "type"] == 1 && cDEFSDf[i, "predicted0n1"] == 1)
+            cDEFSDf[i, "CM"] = "TP"
+            cDEFSDf_TP += 1
+        elseif (cDEFSDf[i, "type"] == 0 && cDEFSDf[i, "predicted0n1"] == 1)
+            cDEFSDf[i, "CM"] = "FP"
+            cDEFSDf_FP += 1
+        elseif (cDEFSDf[i, "type"] == 0 && cDEFSDf[i, "predicted0n1"] == 0)
+            cDEFSDf[i, "CM"] = "TN"
+            cDEFSDf_TN += 1
+        elseif (cDEFSDf[i, "type"] == 1 && cDEFSDf[i, "predicted0n1"] == 0)
+            cDEFSDf[i, "CM"] = "FN"
+            cDEFSDf_FN += 1
+        end
+    end
+    #
+    CM_CWith = zeros(2, 2)
+    CM_CWith[2, 1] = cDEFSDf_TP
+    CM_CWith[2, 2] = cDEFSDf_FP
+    CM_CWith[1, 2] = cDEFSDf_TN
+    CM_CWith[1, 1] = cDEFSDf_FN
+
+## save ##
+savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\df_Clinics2_raMSIn_norm_0n1_postPredict.csv"
+CSV.write(savePath, cDEFSDf)
 
 
 # ==================================================================================================

@@ -47,6 +47,20 @@ df22_top17 = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\
     savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_nonInDI_raMSIn4nonInDI.csv"
     CSV.write(savePath, df22_DI)
 
+
+df77_top17 = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\noSTDtop17_raMSIn_nonInClinicsMSI2.csv", DataFrame)
+    top17_7clusters_ = df77_top17[:,2]
+    top17_7clusters = ["pixel_id"]
+    for top in top17_7clusters_
+        push!(top17_7clusters, string(top))
+    end
+    push!(top17_7clusters, "type")
+    
+    df77 = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_NonInClinicsMSI\\XGB_FNA\\df_ROI_for_ML_Opti_Clinics.csv", DataFrame)[:,top17_7clusters]
+
+    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_nonInDI_raMSIn4nonInClinicsMSI2.csv"
+    CSV.write(savePath, df77)
+
 # ==================================================================================================
 ## prepare training set ##
 size(df24_train, 2)
@@ -201,3 +215,34 @@ size(df22_DI, 2)
     
     df22_DI[df22_DI.type .== 1, :]
     # 0: 3027; 1: 3030
+
+# ==================================================================================================
+# prepare Clinics set
+size(df77, 2)
+    for row = 1:size(df77, 1)
+        for col = 2:size(df77, 2)-1
+            df77[row, col] = sqrt(df77[row, col])
+            #df77[row, col] = log10(df77[row, col])
+        end
+    end
+    describe(df77)
+
+    ## save ##
+    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_nonInDI_raMSIn4nonInClinicsMSI2_log.csv"
+    CSV.write(savePath, df77)
+
+    for f in 2:size(df77, 2)-1
+        avg = float(mean(df77[:, f]))
+        top = float(maximum(df77[:, f]))
+        down = float(minimum(df77[:, f]))
+        for i = 1:size(df77, 1)
+            df77[i, f] = (df77[i, f] - avg) / (top - down)
+        end
+    end
+    describe(df77)
+    ## save ##
+    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_nonInDI_raMSIn4nonInClinicsMSI2_norm.csv"
+    CSV.write(savePath, df77)
+    
+    df77[df77.type .== 1, :]
+    # 0: 3449; 1: 3262
