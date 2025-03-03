@@ -61,6 +61,8 @@ df77_top17 = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\
     savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_nonInDI_raMSIn4nonInClinicsMSI2.csv"
     CSV.write(savePath, df77)
 
+    #df77 = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_nonInDI_raMSIn4nonInClinicsMSI3.csv", DataFrame)
+
 # ==================================================================================================
 ## prepare training set ##
 size(df24_train, 2)
@@ -228,7 +230,7 @@ size(df77, 2)
     describe(df77)
 
     ## save ##
-    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_nonInDI_raMSIn4nonInClinicsMSI2_log.csv"
+    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_nonInDI_raMSIn4nonInClinicsMSI3_log.csv"
     CSV.write(savePath, df77)
 
     for f in 2:size(df77, 2)-1
@@ -239,9 +241,23 @@ size(df77, 2)
             df77[i, f] = (df77[i, f] - avg) / (top - down)
         end
     end
+#=     for f in 2:size(df77, 2)-3
+        avg = float(mean(df77[:, f]))
+        top = float(maximum(df77[:, f]))
+        down = float(minimum(df77[:, f]))
+        for i = 1:size(df77, 1)
+            df77[i, f] = (df77[i, f] - avg) / (top - down)
+        end
+    end
+    avg = float(mean(df77[:, size(df77, 2)-1]))
+    top = float(maximum(df77[:, size(df77, 2)-1]))
+    down = float(minimum(df77[:, size(df77, 2)-1]))
+    for i = 1:size(df77, 1)
+        df77[i, size(df77, 2)-1] = (df77[i, size(df77, 2)-1] - avg) / (top - down)
+    end =#
     describe(df77)
     ## save ##
-    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_nonInDI_raMSIn4nonInClinicsMSI2_norm.csv"
+    savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\df_nonInDI_raMSIn4nonInClinicsMSI3_norm.csv"
     CSV.write(savePath, df77)
     
     df77[df77.type .== 1, :]

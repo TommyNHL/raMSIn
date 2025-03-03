@@ -45,7 +45,7 @@ trainDEFSDf = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\
 extDEFSDf = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\df_ext_raMSIn_norm_0n1.csv", DataFrame)
 fnaDEFSDf = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\df_FNA_raMSIn_norm_0n1.csv", DataFrame)
 diDEFSDf = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\df_Di_raMSIn_norm_0n1.csv", DataFrame)
-cDEFSDf = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\df_Clinics2_raMSIn_norm_0n1.csv", DataFrame)
+cDEFSDf = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\df_Clinics3_raMSIn_norm_0n1.csv", DataFrame)
 
 # ==================================================================================================
 ## prepare to plot confusion matrix for training set ##
@@ -212,7 +212,7 @@ cDEFSDf[!, "CM"] .= String("")
     CM_CWith[1, 1] = cDEFSDf_FN
 
 ## save ##
-savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\df_Clinics2_raMSIn_norm_0n1_postPredict.csv"
+savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\df_Clinics3_raMSIn_norm_0n1_postPredict.csv"
 CSV.write(savePath, cDEFSDf)
 
 
