@@ -1,7 +1,7 @@
 # raMSIn
 This GitHub repository shares the scripts in Julia and Python programming languages that are used for resolution-adaptive regression equation computation for SQL database construction, denoising, data extraction & transformation (the ETL process), feature selection, model selection, model development, and deployment for the work entitled "Physically Constrained Mass Spectrometry Data Binning on Multi-Platform Untargeted Metabolomics Data Reveals Generic Biomarkers for Hepatocellular Carcinoma".
 ### The machine learning models that is developed in this project "raMSIn" is available at ###
-[https://bitbucket.org/hiulokngan/modelsExposomeProjUvA/](https://bitbucket.org/hiulokngan/modelsHCCAMC/src/main/)
+https://bitbucket.org/hiulokngan/modelsHCCAMC/src/main/
 
 ### Submitted: March 2025,
 ***Hiu-Lok Ngan,1,# Jialing Zhang,1,# Kenneth Kin-Leung Kwan,2,3 Jacinth Wing-Sum Cheu,2,3 Li Zhong,1 Yike Guo,4,5 Xian Yang,4,6 Carmen Chak-Lui Wong,2,3,* Hong Yan,1,* Zongwei Cai1,7,* ***
