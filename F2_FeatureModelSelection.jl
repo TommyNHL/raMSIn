@@ -7,8 +7,8 @@ using Pkg
 ## import packages from Julia ##
 import Conda
 Conda.PYTHONDIR
-ENV["PYTHON"] = raw"C:\Users\T1208\AppData\Local\Programs\Python\Python311\python.exe"  # python 3.11
-#ENV["PYTHON"] = raw"C:\Users\user\AppData\Local\Programs\Python\Python311\python.exe"  # python 3.11
+#ENV["PYTHON"] = raw"C:\Users\T1208\AppData\Local\Programs\Python\Python311\python.exe"  # python 3.11
+ENV["PYTHON"] = raw"C:\Users\user\AppData\Local\Programs\Python\Python311\python.exe"  # python 3.11
 Pkg.build("PyCall")
 Pkg.status()
 using Random
@@ -41,7 +41,7 @@ make_scorer = pyimport("sklearn.metrics").make_scorer
 f1 = make_scorer(f1_score, pos_label=1, average="binary")
 
 ## input training set ## 90960 x 20 df
-trainDEFSDf = CSV.read("C:\\Users\\T1208\\PyLAB\\raMSIn\\df_train_raMSIn4nonInDI_norm.csv", DataFrame)
+trainDEFSDf = CSV.read("I:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\raMSIn\\df_train_raMSIn4nonInDI_STDnorm.csv", DataFrame)
 trainDEFSDf = trainDEFSDf[:, vcat(1, collect(2:9), 16, 17, end)]
 trainDEFSDf[trainDEFSDf.type .== 1, :]
     ## calculate weight ## 0: 47449, 1: 43511
@@ -56,7 +56,7 @@ trainDEFSDf[trainDEFSDf.type .== 1, :]
     end 
 
 ## input ext val set ## 6075 x 20 df
-extDEFSDf = CSV.read("C:\\Users\\T1208\\PyLAB\\raMSIn\\df_ext_raMSIn4nonInDI_norm.csv", DataFrame)
+extDEFSDf = CSV.read("I:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\raMSIn\\df_ext_raMSIn4nonInDI_STDnorm.csv", DataFrame)
 extDEFSDf = extDEFSDf[:, vcat(1, collect(2:9), 16, 17, end)]
 extDEFSDf[extDEFSDf.type .== 1, :]
     ## calculate weight ## 0: 2943, 1: 3132
@@ -71,7 +71,7 @@ extDEFSDf[extDEFSDf.type .== 1, :]
     end 
 
 ## reconstruct a whole set ## 97035 x 20 df
-ingestedDEFSDf = CSV.read("C:\\Users\\T1208\\PyLAB\\raMSIn\\df_ingested_raMSIn4nonInDI_norm.csv", DataFrame)
+ingestedDEFSDf = CSV.read("I:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\raMSIn\\df_ingested_raMSIn4nonInDI_STDnorm.csv", DataFrame)
 ingestedDEFSDf = ingestedDEFSDf[:, vcat(1, collect(2:9), 16, 17, end)]
 ingestedDEFSDf[ingestedDEFSDf.type .== 1, :]
     ## calculate weight ## 0: 50392, 1: 46643
@@ -86,7 +86,7 @@ ingestedDEFSDf[ingestedDEFSDf.type .== 1, :]
     end 
 
 ## input FNA set ## 88701 x 20 df
-fnaDEFSDf = CSV.read("C:\\Users\\T1208\\PyLAB\\raMSIn\\df_FNA_raMSIn4nonInDI_norm.csv", DataFrame)
+fnaDEFSDf = CSV.read("I:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\raMSIn\\df_FNA_raMSIn4nonInDI_STDnorm.csv", DataFrame)
 fnaDEFSDf = fnaDEFSDf[:, vcat(1, collect(2:9), 16, 17, end)]
 fnaDEFSDf[fnaDEFSDf.type .== 1, :]
     ## calculate weight ##  0: 44540, 1: 44161
@@ -101,17 +101,17 @@ fnaDEFSDf[fnaDEFSDf.type .== 1, :]
     end  
 
 ## input DirectIn set ## 88701 x 20 df
-diDEFSDf = CSV.read("C:\\Users\\T1208\\PyLAB\\raMSIn\\df_nonInDI_raMSIn4nonInDI_norm.csv", DataFrame)
+diDEFSDf = CSV.read("I:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\raMSIn\\df_nonInDI_raMSIn4nonInDI_STDnorm.csv", DataFrame)
 diDEFSDf = diDEFSDf[:, vcat(1, collect(2:9), 16, 17, end)]
 diDEFSDf[diDEFSDf.type .== 1, :]
-    ## calculate weight ##  0: 3027, 1: 3030
+    ## calculate weight ##  0: 1513, 1: 1515
     Yy_DI = deepcopy(diDEFSDf[:, end])  # 1.0005; 0.9995
     sampleDiW = []
     for w in Vector(Yy_DI)
         if w == 0
-            push!(sampleDiW, 1.0005)
+            push!(sampleDiW, 1.0007)
         elseif w == 1
-            push!(sampleDiW, 0.9995)
+            push!(sampleDiW, 0.9993)
         end
     end  
 
@@ -130,13 +130,13 @@ diDEFSDf[diDEFSDf.type .== 1, :]
 ## define a function for Random Forest ##
 function optimRandomForestClass(inputDB, inputDB_ingested, inputDB_ext, inputDB_FNA, inputDB_di)
     #leaf_r = vcat(2, 4, 8, 12, 18)  # 5
-    #leaf_r = vcat(collect(2:1:8))  # 7
-    leaf_r = vcat(collect(18:1:28))  # 11
+    leaf_r = vcat(collect(2:1:8))  # 7
+    #leaf_r = vcat(collect(18:1:28))  # 11
     #depth_r = vcat(collect(2:1:10))  # 9
-    #depth_r = vcat(collect(6:1:14))  # 9
-    depth_r = vcat(collect(4:1:10))  # 7
+    depth_r = vcat(collect(6:1:14))  # 9
+    #depth_r = vcat(collect(4:1:10))  # 7
     #split_r = vcat(collect(2:1:10))  # 9
-    split_r = vcat(collect(10:5:20))  # 3
+    split_r = vcat(collect(2:4:22))  # 3
     tree_r = vcat(collect(50:50:300))  # 6
 
     rs = 42
@@ -263,7 +263,7 @@ end
 optiSearch_df = optimRandomForestClass(trainDEFSDf, ingestedDEFSDf, extDEFSDf, fnaDEFSDf, diDEFSDf)
 
 ## save ##
-savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\modeling\\hyperparameterTuning_modelSelection_RF3.csv"
+savePath = "I:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\raMSIn\\modeling\\hyperparameterTuning_modelSelection_RF3.csv"
 CSV.write(savePath, optiSearch_df)
 
 
@@ -271,11 +271,11 @@ CSV.write(savePath, optiSearch_df)
 ## define a function for Decision Tree ##
 function optimDecisionTreeClass(inputDB, inputDB_ingested, inputDB_ext, inputDB_FNA, inputDB_di)
     #leaf_r = vcat(2, 4, 8, 12, 18)  # 5
-    #leaf_r = vcat(collect(2:2:12), collect(16:4:48), collect(56:8:80), 100, 200, 500)  # 6+9+4+3=22
-    leaf_r = vcat(collect(20:1:30))  # 11
+    leaf_r = vcat(collect(2:2:12), collect(16:4:48), collect(56:8:80), 100, 200, 500)  # 6+9+4+3=22
+    #leaf_r = vcat(collect(20:1:30))  # 11
     #depth_r = vcat(collect(2:1:10))  # 9
-    #depth_r = vcat(collect(2:1:14))  # 13
-    depth_r = vcat(collect(4:1:8))  # 5
+    depth_r = vcat(collect(2:1:14))  # 13
+    #depth_r = vcat(collect(4:1:8))  # 5
     #split_r = vcat(collect(2:1:10))  # 9
     split_r = vcat(collect(2:2:10))  # 5
 
@@ -400,7 +400,7 @@ end
 optiSearch_df = optimDecisionTreeClass(trainDEFSDf, ingestedDEFSDf, extDEFSDf, fnaDEFSDf, diDEFSDf)
 
 ## save ##
-savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\modeling\\hyperparameterTuning_modelSelection_DT3.csv"
+savePath = "I:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\raMSIn\\modeling\\hyperparameterTuning_modelSelection_DT3.csv"
 CSV.write(savePath, optiSearch_df)
 
 
@@ -409,9 +409,9 @@ CSV.write(savePath, optiSearch_df)
 function optimLR(inputDB, inputDB_ingested, inputDB_ext, inputDB_FNA, inputDB_di)
     penalty_r = ["l1", "l2"]  # 2
     solver_rs = ["newton-cg", "lbfgs", "liblinear", "sag", "saga"]  # 5
-    #c_values_r = vcat(1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.075, 0.05, 0.025, 0.01)  # 14
-    #c_values_r = vcat(collect(0.01:0.01:0.05), collect(0.001:0.001:0.009), 0.00075, 0.0005)  # 8
-    c_values_r = vcat(collect(0.001:0.00025:0.00375), collect(0.0001:0.00005:0.00095), 0.00001, 0.000025, 0.00005, 0.000075)  # 13
+    #3#c_values_r = vcat(1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.075, 0.05, 0.025, 0.01)  # 14
+    #2#c_values_r = vcat(collect(0.01:0.01:0.05), collect(0.001:0.001:0.009), 0.00075, 0.0005)  # 8
+    #1#c_values_r = vcat(collect(0.001:0.00025:0.00375), collect(0.0001:0.00005:0.00095), 0.00001, 0.000025, 0.00005, 0.000075)  # 13
 
     rs = 42
     z = zeros(1,35)
@@ -539,7 +539,7 @@ end
 optiSearch_df = optimLR(trainDEFSDf, ingestedDEFSDf, extDEFSDf, fnaDEFSDf, diDEFSDf)
 
 ## save ##
-savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\modeling\\hyperparameterTuning_modelSelection_LR1.csv"
+savePath = "I:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\raMSIn\\modeling\\hyperparameterTuning_modelSelection_LR3.csv"
 CSV.write(savePath, optiSearch_df)
 
 
@@ -680,7 +680,7 @@ end
 optiSearch_df = optimSVM(trainDEFSDf, ingestedDEFSDf, extDEFSDf, fnaDEFSDf, diDEFSDf)
 
 ## save ##
-savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\modeling\\hyperparameterTuning_modelSelection_SVM1.csv"
+savePath = "I:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\raMSIn\\modeling\\hyperparameterTuning_modelSelection_SVM1.csv"
 CSV.write(savePath, optiSearch_df)
 
 
@@ -690,17 +690,20 @@ function optimGradientBoostClass(inputDB, inputDB_ingested, inputDB_ext, inputDB
     #lr_r = vcat(0.3, 0.1)  # 2
     #lr_r = vcat(0.5, collect(1:2:9))  # 6
     #lr_r = vcat(collect(2:0.5:9))  # 15
-    lr_r = vcat(collect(3.5:0.1:4.5))  # 11
+    #lr_r = vcat(collect(3.5:0.1:4.5))  # 11
+    #lr_r = vcat(collect(7:0.1:9))  # 21
+    lr_r = vcat(collect(7.5:0.1:8.5))  # 11
     #leaf_r = vcat(8, 12, 18)  # 3
     #leaf_r = vcat(collect(2:4:10))  # 3
-    leaf_r = vcat(collect(2:1:8))  # 7
+    #leaf_r = vcat(collect(2:1:8))  # 7
+    leaf_r = vcat(collect(2:1:12))  # 11
     #depth_r = vcat(collect(6:2:10))  # 3
     #depth_r = vcat(collect(4:1:8))  # 5
     depth_r = vcat(collect(5:1:10))  # 6
     #split_r = vcat(collect(10:10:20))  # 2
     #split_r = vcat(collect(15:15:30))  # 2
-    #split_r = vcat(30)  # 1
-    split_r = vcat(10, 30, 50)  # 3
+    split_r = vcat(30)  # 1
+    #split_r = vcat(10, 30, 50)  # 3
     #tree_r = vcat(collect(50:100:250))  # 3
     #tree_r = vcat(collect(25:25:75))  # 3
     tree_r = vcat(50)  # 1
@@ -832,5 +835,5 @@ end
 optiSearch_df = optimGradientBoostClass(trainDEFSDf, ingestedDEFSDf, extDEFSDf, fnaDEFSDf, diDEFSDf)
 
 ## save ##
-savePath = "C:\\Users\\T1208\\PyLAB\\raMSIn\\hyperparameterTuning_modelSelection_GBM4.csv"
+savePath = "I:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\raMSIn\\modeling\\hyperparameterTuning_modelSelection_GBM4.csv"
 CSV.write(savePath, optiSearch_df)

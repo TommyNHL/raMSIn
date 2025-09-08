@@ -41,10 +41,10 @@ make_scorer = pyimport("sklearn.metrics").make_scorer
 f1 = make_scorer(f1_score, pos_label=1, average="binary")
 
 ## input ## predicted0n1
-trainDEFSDf = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\dbMSIn_5ppm\\df_train_dbMSIn5ppm_norm_0n1.csv", DataFrame)
-extDEFSDf = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\dbMSIn_5ppm\\df_ext_dbMSIn5ppm_norm_0n1.csv", DataFrame)
-fnaDEFSDf = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\dbMSIn_5ppm\\df_FNA_dbMSIn5ppm_norm_0n1.csv", DataFrame)
-diDEFSDf = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\dbMSIn_5ppm\\df_Di_dbMSIn5ppm_norm_0n1.csv", DataFrame)
+trainDEFSDf = CSV.read("I:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\raMSIn\\modeling\\df_train_dbMSIn5ppm_STDnorm_0n1.csv", DataFrame)
+extDEFSDf = CSV.read("I:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\raMSIn\\modeling\\df_ext_dbMSIn5ppm_STDnorm_0n1.csv", DataFrame)
+fnaDEFSDf = CSV.read("I:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\raMSIn\\modeling\\df_FNA_dbMSIn5ppm_STDnorm_0n1.csv", DataFrame)
+diDEFSDf = CSV.read("I:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\raMSIn\\modeling\\df_Di_dbMSIn5ppm_STDnorm_0n1.csv", DataFrame)
 
 # ==================================================================================================
 ## prepare to plot confusion matrix for training set ##
@@ -76,7 +76,7 @@ trainDEFSDf[!, "CM"] .= String("")
     CM_TrainWith[1, 1] = trainDEFSDf_FN
 
 ## save ##
-savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\dbMSIn_5ppm\\df_train_dbMSIn5ppm_norm_0n1_postPredict.csv"
+savePath = "I:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\raMSIn\\modeling\\df_train_dbMSIn5ppm_STDnorm_0n1_postPredict.csv"
 CSV.write(savePath, trainDEFSDf)
 
 
@@ -110,7 +110,7 @@ extDEFSDf[!, "CM"] .= String("")
     CM_ExtWith[1, 1] = extDEFSDf_FN
 
 ## save ##
-savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\dbMSIn_5ppm\\df_ext_dbMSIn5ppm_norm_0n1_postPredict.csv"
+savePath = "I:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\raMSIn\\modeling\\df_ext_dbMSIn5ppm_STDnorm_0n1_postPredict.csv"
 CSV.write(savePath, extDEFSDf)
 
 # ==================================================================================================
@@ -143,7 +143,7 @@ fnaDEFSDf[!, "CM"] .= String("")
     CM_FNAWith[1, 1] = fnaDEFSDf_FN
 
 ## save ##
-savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\dbMSIn_5ppm\\df_FNA_dbMSIn5ppm_norm_0n1_postPredict.csv"
+savePath = "I:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\raMSIn\\modeling\\df_FNA_dbMSIn5ppm_STDnorm_0n1_postPredict.csv"
 CSV.write(savePath, fnaDEFSDf)
 
 
@@ -177,7 +177,7 @@ diDEFSDf[!, "CM"] .= String("")
     CM_DiWith[1, 1] = diDEFSDf_FN
 
 ## save ##
-savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\dbMSIn_5ppm\\df_Di_dbMSIn5ppm_norm_0n1_postPredict.csv"
+savePath = "I:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\raMSIn\\modeling\\df_Di_dbMSIn5ppm_STDnorm_0n1_postPredict.csv"
 CSV.write(savePath, diDEFSDf)
 
 

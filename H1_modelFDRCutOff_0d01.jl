@@ -41,10 +41,10 @@ make_scorer = pyimport("sklearn.metrics").make_scorer
 f1 = make_scorer(f1_score, pos_label=1, average="binary")
 
 ## input ## predicted0n1
-trainDEFSDf = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\dbMSIn_10ppm\\df_train_dbMSIn10ppm_norm_0n1.csv", DataFrame)
-extDEFSDf = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\dbMSIn_10ppm\\df_ext_dbMSIn10ppm_norm_0n1.csv", DataFrame)
-fnaDEFSDf = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\dbMSIn_10ppm\\df_FNA_dbMSIn10ppm_norm_0n1.csv", DataFrame)
-diDEFSDf = CSV.read("H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\dbMSIn_10ppm\\df_Di_dbMSIn10ppm_norm_0n1.csv", DataFrame)
+trainDEFSDf = CSV.read("I:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\raMSIn\\modeling\\df_train_cbMSIn0d01_STDnorm_0n1.csv", DataFrame)
+extDEFSDf = CSV.read("I:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\raMSIn\\modeling\\df_ext_cbMSIn0d01_STDnorm_0n1.csv", DataFrame)
+fnaDEFSDf = CSV.read("I:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\raMSIn\\modeling\\df_FNA_cbMSIn0d01_STDnorm_0n1.csv", DataFrame)
+diDEFSDf = CSV.read("I:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\raMSIn\\modeling\\df_Di_cbMSIn0d01_STDnorm_0n1.csv", DataFrame)
 
 # ==================================================================================================
 ## prepare to plot confusion matrix for training set ##
@@ -76,7 +76,7 @@ trainDEFSDf[!, "CM"] .= String("")
     CM_TrainWith[1, 1] = trainDEFSDf_FN
 
 ## save ##
-savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\dbMSIn_10ppm\\df_train_dbMSIn10ppm_norm_0n1_postPredict.csv"
+savePath = "I:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\raMSIn\\modeling\\df_train_cbMSIn0d01_STDnorm_0n1_postPredict.csv"
 CSV.write(savePath, trainDEFSDf)
 
 
@@ -110,7 +110,7 @@ extDEFSDf[!, "CM"] .= String("")
     CM_ExtWith[1, 1] = extDEFSDf_FN
 
 ## save ##
-savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\dbMSIn_10ppm\\df_ext_dbMSIn10ppm_norm_0n1_postPredict.csv"
+savePath = "I:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\raMSIn\\modeling\\df_ext_cbMSIn0d01_STDnorm_0n1_postPredict.csv"
 CSV.write(savePath, extDEFSDf)
 
 # ==================================================================================================
@@ -143,7 +143,7 @@ fnaDEFSDf[!, "CM"] .= String("")
     CM_FNAWith[1, 1] = fnaDEFSDf_FN
 
 ## save ##
-savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\dbMSIn_10ppm\\df_FNA_dbMSIn10ppm_norm_0n1_postPredict.csv"
+savePath = "I:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\raMSIn\\modeling\\df_FNA_cbMSIn0d01_STDnorm_0n1_postPredict.csv"
 CSV.write(savePath, fnaDEFSDf)
 
 
@@ -177,7 +177,7 @@ diDEFSDf[!, "CM"] .= String("")
     CM_DiWith[1, 1] = diDEFSDf_FN
 
 ## save ##
-savePath = "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\dbMSIn_10ppm\\df_Di_dbMSIn10ppm_norm_0n1_postPredict.csv"
+savePath = "I:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\raMSIn\\modeling\\df_Di_cbMSIn0d01_STDnorm_0n1_postPredict.csv"
 CSV.write(savePath, diDEFSDf)
 
 
@@ -200,10 +200,10 @@ heatmap!(["1", "0"], ["0", "1"], CM_TrainWith, cmap = :viridis, cbar = :true,
         titlefont = font(16), 
         size = (1400,600), 
         dpi = 300)
-        annotate!(["1"], ["1"], ["TP\n39,870"], subplot = 1)
-        annotate!(["0"], ["1"], ["FP\n5,626"], subplot = 1, font(color="white"))
-        annotate!(["1"], ["0"], ["FN\n3,641"], subplot = 1, font(color="white"))
-        annotate!(["0"], ["0"], ["TN\n41,823"], subplot = 1)
+        annotate!(["1"], ["1"], ["TP\n37,986"], subplot = 1)
+        annotate!(["0"], ["1"], ["FP\n6,642"], subplot = 1, font(color="white"))
+        annotate!(["1"], ["0"], ["FN\n5,525"], subplot = 1, font(color="white"))
+        annotate!(["0"], ["0"], ["TN\n40,807"], subplot = 1)
 heatmap!(["1", "0"], ["0", "1"], CM_ExtWith, cmap = :viridis, cbar = :true, 
         clims = (0, 3000), 
         subplot = 2, 
@@ -216,11 +216,11 @@ heatmap!(["1", "0"], ["0", "1"], CM_ExtWith, cmap = :viridis, cbar = :true,
         titlefont = font(16), 
         size = (1400,600), 
         dpi = 300)
-        annotate!(["1"], ["1"], ["TP\n2,892"], subplot = 2)
-        annotate!(["0"], ["1"], ["FP\n977"], subplot = 2, font(color="white"))
-        annotate!(["1"], ["0"], ["FN\n240"], subplot = 2, font(color="white"))
-        annotate!(["0"], ["0"], ["TN\n1,966"], subplot = 2)
-savefig(TrainOutplotCM, "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\dbMSIn_10ppm\\prediction_trainExtValCM.png")
+        annotate!(["1"], ["1"], ["TP\n2,598"], subplot = 2)
+        annotate!(["0"], ["1"], ["FP\n931"], subplot = 2, font(color="white"))
+        annotate!(["1"], ["0"], ["FN\n534"], subplot = 2, font(color="white"))
+        annotate!(["0"], ["0"], ["TN\n2,012"], subplot = 2)
+savefig(TrainOutplotCM, "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\cbMSIn_0d01\\prediction_trainExtValCM.png")
 
 
 # ==================================================================================================
@@ -241,10 +241,10 @@ heatmap!(["1", "0"], ["0", "1"], CM_FNAWith, cmap = :viridis, cbar = :true,
         titlefont = font(16), 
         size = (1400,600), 
         dpi = 300)
-        annotate!(["1"], ["1"], ["TP\n33,894"], subplot = 1)
-        annotate!(["0"], ["1"], ["FP\n17,755"], subplot = 1, font(color="white"))
-        annotate!(["1"], ["0"], ["FN\n10,267"], subplot = 1, font(color="white"))
-        annotate!(["0"], ["0"], ["TN\n26,785"], subplot = 1)
+        annotate!(["1"], ["1"], ["TP\n31,978"], subplot = 1)
+        annotate!(["0"], ["1"], ["FP\n21,063"], subplot = 1, font(color="white"))
+        annotate!(["1"], ["0"], ["FN\n12,183"], subplot = 1, font(color="white"))
+        annotate!(["0"], ["0"], ["TN\n23,477"], subplot = 1)
 heatmap!(["1", "0"], ["0", "1"], CM_DiWith, cmap = :viridis, cbar = :true, 
         clims = (0, 3000), 
         subplot = 2, 
@@ -257,8 +257,8 @@ heatmap!(["1", "0"], ["0", "1"], CM_DiWith, cmap = :viridis, cbar = :true,
         titlefont = font(16), 
         size = (1400,600), 
         dpi = 300)
-        annotate!(["1"], ["1"], ["TP\n1,936"], subplot = 2)
-        annotate!(["0"], ["1"], ["FP\n1,238"], subplot = 2, font(color="white"))
-        annotate!(["1"], ["0"], ["FN\n1,094"], subplot = 2, font(color="white"))
-        annotate!(["0"], ["0"], ["TN\n1,789"], subplot = 2)
-savefig(FNAOutplotCM, "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\dbMSIn_10ppm\\prediction_FNAnDICM.png")
+        annotate!(["1"], ["1"], ["TP\n1,847"], subplot = 2)
+        annotate!(["0"], ["1"], ["FP\n1,017"], subplot = 2, font(color="white"))
+        annotate!(["1"], ["0"], ["FN\n1,183"], subplot = 2, font(color="white"))
+        annotate!(["0"], ["0"], ["TN\n2,010"], subplot = 2)
+savefig(FNAOutplotCM, "H:\\3_output_raMSIn\\3_3_Output_raMSIn_HKU_Ingested4ALL\\XGB_ALL\\afterModelSelection\\cbMSIn_0d01\\prediction_FNAnDICM.png")
