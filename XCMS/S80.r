@@ -23,6 +23,6 @@ xsetc <-  xcms::retcor(xset, method = "obiwarp", plottype = "deviation",
                        profStep = 0.1) 
 dev.off() 
 
-peak <- xset@peak 
+peak <- xset@peaks
 write.csv(peak, "Peak-table.csv", row.names = FALSE)
 
