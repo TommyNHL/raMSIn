@@ -1,5 +1,5 @@
 # raMSIn
-This GitHub repository shares the scripts in Julia and Python programming languages that are used for resolution-adaptive regression equation computation for SQL database construction, denoising, data extraction & transformation (the ETL process), feature selection, model selection, model development, and deployment for the work entitled "Resolution-Adaptive Binning Enhances Machine Learning Modeling By Inter-Batch and Multi-Platform Orbitrap-Based Shotgun Mass Spectrometry Data Integration".
+This GitHub repository shares the scripts in Julia and Python programming languages that are used for resolution-adaptive regression equation computation for SQL database construction, denoising, data extraction & transformation (the ETL process), feature selection, model selection, model development, and deployment for the work entitled "Resolution-Adaptive Binning Enhances Machine Learning Modeling by Interbatch and Multiplatform Orbitrap-Based Shotgun Mass Spectrometry Data Integration".
 ### The machine learning model that is developed in this project "raMSIn" is available at ###
 https://bitbucket.org/hiulokngan/modelsHCCAMC/src/main/
 
